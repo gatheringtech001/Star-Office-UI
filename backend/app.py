@@ -912,8 +912,9 @@ if __name__ == "__main__":
     print("=" * 50)
     print("Star Office UI - Backend State Service")
     print("=" * 50)
+    OFFICE_PORT = int(os.environ.get("OFFICE_PORT", "19000"))
     print(f"State file: {STATE_FILE}")
-    print("Listening on: http://0.0.0.0:18791")
+    print(f"Listening on: http://0.0.0.0:{OFFICE_PORT}")
     print("=" * 50)
     
-    app.run(host="0.0.0.0", port=19000, debug=False)
+    app.run(host="0.0.0.0", port=OFFICE_PORT, debug=False)
