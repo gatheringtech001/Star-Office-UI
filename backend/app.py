@@ -37,6 +37,8 @@ except Exception:
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEMORY_DIR = os.path.join(os.path.dirname(ROOT_DIR), "memory")
 FRONTEND_DIR = os.path.join(ROOT_DIR, "frontend")
+FRONTEND_INDEX_FILE = os.path.join(FRONTEND_DIR, "index.html")
+FRONTEND_ELECTRON_STANDALONE_FILE = os.path.join(FRONTEND_DIR, "electron-standalone.html")
 STATE_FILE = os.path.join(ROOT_DIR, "state.json")
 AGENTS_STATE_FILE = os.path.join(ROOT_DIR, "agents-state.json")
 JOIN_KEYS_FILE = os.path.join(ROOT_DIR, "join-keys.json")
@@ -186,9 +188,26 @@ def save_state(state: dict):
         json.dump(state, f, ensure_ascii=False, indent=2)
 
 
+def ensure_electron_standalone_snapshot():
+    """Create Electron standalone frontend snapshot once if missing.
+
+    The snapshot is intentionally decoupled from the browser page:
+    - browser uses frontend/index.html
+    - Electron uses frontend/electron-standalone.html
+    """
+    if os.path.exists(FRONTEND_ELECTRON_STANDALONE_FILE):
+        return
+    try:
+        shutil.copy2(FRONTEND_INDEX_FILE, FRONTEND_ELECTRON_STANDALONE_FILE)
+        print(f"[standalone] created: {FRONTEND_ELECTRON_STANDALONE_FILE}")
+    except Exception as e:
+        print(f"[standalone] create failed: {e}")
+
+
 # Initialize state
 if not os.path.exists(STATE_FILE):
     save_state(DEFAULT_STATE)
+ensure_electron_standalone_snapshot()
 
 
 _INDEX_HTML_CACHE = None
@@ -203,11 +222,29 @@ def index():
 
     global _INDEX_HTML_CACHE
     if _INDEX_HTML_CACHE is None:
-        with open(os.path.join(FRONTEND_DIR, "index.html"), "r", encoding="utf-8") as f:
+        with open(FRONTEND_INDEX_FILE, "r", encoding="utf-8") as f:
             raw_html = f.read()
         _INDEX_HTML_CACHE = raw_html.replace("{{VERSION_TIMESTAMP}}", VERSION_TIMESTAMP)
 
     resp = make_response(_INDEX_HTML_CACHE)
+    resp.headers["Content-Type"] = "text/html; charset=utf-8"
+    return resp
+
+
+@app.route("/electron-standalone", methods=["GET"])
+def electron_standalone_page():
+    """Serve Electron-only standalone frontend page."""
+    ensure_electron_standalone_snapshot()
+    target = FRONTEND_ELECTRON_STANDALONE_FILE
+    if not os.path.exists(target):
+        target = FRONTEND_INDEX_FILE
+    with open(target, "r", encoding="utf-8") as f:
+        html = f.read()
+    html = html.replace("{{VERSION_TIMESTAMP}}", VERSION_TIMESTAMP)
+    resp = make_response(html)
+    resp.headers["Content-Type"] = "text/html; charset=utf-8"
+    return resp
+
     resp.headers["Content-Type"] = "text/html; charset=utf-8"
     return resp
 
@@ -1913,11 +1950,19 @@ def assets_upload():
 
 
 if __name__ == "__main__":
+    raw_port = os.environ.get("STAR_BACKEND_PORT", "18791")
+    try:
+        backend_port = int(raw_port)
+    except ValueError:
+        backend_port = 18791
+    if backend_port <= 0:
+        backend_port = 18791
+
     print("=" * 50)
     print("Star Office UI - Backend State Service")
     print("=" * 50)
     print(f"State file: {STATE_FILE}")
-    print("Listening on: http://0.0.0.0:18791")
+    print(f"Listening on: http://0.0.0.0:{backend_port}")
     mode = "production" if is_production_mode() else "development"
     print(f"Mode: {mode}")
     if is_production_mode():
@@ -1934,4 +1979,5 @@ if __name__ == "__main__":
             print("Security hardening: OK")
     print("=" * 50)
 
-    app.run(host="0.0.0.0", port=18791, debug=False)
+    app.run(host="0.0.0.0", port=backend_port, debug=False)
+
