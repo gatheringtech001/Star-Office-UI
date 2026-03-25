@@ -3479,7 +3479,7 @@ function toggleBrokerPanel() {
                 const stateText = stateMap[state] || state;
                 const subtitle = `${statusText} · ${stateText}`;
 
-                const pendingActions = '<button onclick="openDeskView('' + agent.agentId + '','' + name.replace(/'/g,"\\'") + '','' + state + '','' + (agent.detail||'') + '')">查看桌面</button>';
+                const pendingActions = "";
 
                 return `
                   <div class="guest-agent-item" data-name="${name}">
