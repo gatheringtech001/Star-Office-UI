@@ -13,7 +13,7 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #5e4a34;
+            background: #aaaaac;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -118,7 +118,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #5e4a34;
+            background: #aaaaac;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -388,7 +388,7 @@
             font-family:'ArkPixel', monospace;
         }
         .asset-vis-btn:hover { border-color:rgba(148, 163, 184, 0.38); color:#ecfccb; background:rgba(30,41,59,.92); }
-        .asset-thumb { width:56px; height:56px; object-fit: contain; background:#0b1220; border:1px solid rgba(148, 163, 184, 0.16); border-radius:6px; }
+        .asset-thumb { width:56px; height:56px; object-fit: cover; background:#0b1220; border:1px solid rgba(148, 163, 184, 0.16); border-radius:6px; }
         .asset-meta { line-height: 1.45; }
         .asset-path { color:#d1fae5; word-break: break-all; }
         .asset-sub { color:#9ca3af; font-size:11px; }
@@ -805,7 +805,7 @@
             padding-right: 4px;
         }
         #guest-agent-list::-webkit-scrollbar { width: 6px; }
-        #guest-agent-list::-webkit-scrollbar-track { background: #5e4a34; }
+        #guest-agent-list::-webkit-scrollbar-track { background: #aaaaac; }
         #guest-agent-list::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
         .guest-agent-item {
             display: flex;
@@ -952,7 +952,7 @@
             width: 6px;
         }
         #memo-content::-webkit-scrollbar-track {
-            background: #5e4a34;
+            background: #aaaaac;
         }
         #memo-content::-webkit-scrollbar-thumb {
             background: #444;
@@ -1159,7 +1159,7 @@
     <div id="main-stage">
         <div id="game-container">
             <div id="game-skeleton"><div class="hint">正在进入像素办公室…</div></div>
-            <div id="status-text">加载中...</div>
+            <div id="status-text" style="display:none;">加载中...</div>
             <button id="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-collapsed')" style="position:absolute;top:10px;right:10px;z-index:9999;background:rgba(0,0,0,0.7);color:#fff;border:1px solid #475569;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px;font-family:ArkPixel,monospace;">☰ 面板</button>
         </div>
 
@@ -1546,16 +1546,16 @@
 
         const config = {
             type: Phaser.AUTO,
-            width: 2560,
-            height: 720,
+            width: 1280,
+            height: 960,
             parent: 'game-container',
             pixelArt: true,
-            backgroundColor: '#5e4a34',
+            backgroundColor: '#aaaaac',
             scale: {
                 mode: Phaser.Scale.FIT,
                 autoCenter: Phaser.Scale.CENTER_BOTH,
-                width: 2560,
-                height: 720
+                width: 1280,
+                height: 960
             },
             physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
             scene: { preload: preload, create: create, update: update }
@@ -4107,18 +4107,24 @@ function toggleBrokerPanel() {
             for (let i = 1; i <= 6; i++) {
                 this.load.spritesheet('guest_role_' + i, 'static/guest_role_' + i + '.png?v={{VERSION_TIMESTAMP}}', { frameWidth: 64, frameHeight: 64 });
             }
+
+            // 原版角色 atlas（adam/ash/lucy/nancy — 含 idle/run/sit 动画）
+            const charNames = ['adam', 'ash', 'lucy', 'nancy'];
+            charNames.forEach(name => {
+                this.load.atlas('char_' + name, 'static/char_' + name + '.png?v={{VERSION_TIMESTAMP}}', 'static/char_' + name + '.json?v={{VERSION_TIMESTAMP}}');
+            });
         }
 
         function create() {
             game = this;
             hideGameSkeleton();
-            officeBgSprite = this.add.image(800, 400, 'office_bg');
+            officeBgSprite = this.add.image(640, 480, 'office_bg');
 
             // Place furniture: Sofa
             // NOTE: coordinates are interpreted as the TOP-LEFT corner of the sprite
-            const sofaShadow = this.add.image(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y, 'sofa_shadow').setOrigin(0.5).setScale(2);
+            const sofaShadow = this.add.image(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y, 'sofa_shadow').setOrigin(0.5).setScale(2).setVisible(false);
             sofaShadow.setDepth(9);
-            sofa = this.add.sprite(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y, 'sofa_idle').setOrigin(0.5).setScale(2);
+            sofa = this.add.sprite(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y, 'sofa_idle').setOrigin(0.5).setScale(2).setVisible(false);
             sofa.setDepth(10);
             areas = {
                 door: { x: 640, y: 550 }, // 墙的门（偏下 1/3 位置）
@@ -4189,7 +4195,7 @@ function toggleBrokerPanel() {
             // Random plant at (565,178) (frame 0-15, 160x160 each)
             const plantFrameCount = 16;
             const randomPlantFrame = Math.floor(Math.random() * plantFrameCount);
-            const plant = game.add.sprite(1130, 356, 'plants', randomPlantFrame).setOrigin(0.5).setScale(2);
+            const plant = game.add.sprite(1130, 356, 'plants', randomPlantFrame).setOrigin(0.5).setScale(2).setVisible(false);
             plant.setDepth(5);
             plant.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
@@ -4203,7 +4209,7 @@ function toggleBrokerPanel() {
 
             // Random plant at (230,185) (frame 0-15, 160x160 each)
             const plant2Frame = Math.floor(Math.random() * plantFrameCount);
-            const plant2 = game.add.sprite(460, 370, 'plants', plant2Frame).setOrigin(0.5).setScale(2);
+            const plant2 = game.add.sprite(460, 370, 'plants', plant2Frame).setOrigin(0.5).setScale(2).setVisible(false);
             plant2.setDepth(5);
             plant2.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
@@ -4216,7 +4222,7 @@ function toggleBrokerPanel() {
 
             // Random plant at (977,496) (frame 0-15, 160x160 each)
             const plant3Frame = Math.floor(Math.random() * plantFrameCount);
-            const plant3 = game.add.sprite(1954, 992, 'plants', plant3Frame).setOrigin(0.5).setScale(2);
+            const plant3 = game.add.sprite(1954, 992, 'plants', plant3Frame).setOrigin(0.5).setScale(2).setVisible(false);
             plant3.setDepth(5);
             plant3.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
@@ -4230,7 +4236,7 @@ function toggleBrokerPanel() {
             // Random poster at (252,66) (random frame from spritesheet)
             const postersFrameCount = (this.textures.get('posters')?.frameTotal || 1) - 1;
             const randomPosterFrame = Math.floor(Math.random() * Math.max(1, postersFrameCount));
-            const poster = game.add.sprite(504, 132, 'posters', randomPosterFrame).setOrigin(0.5).setScale(2);
+            const poster = game.add.sprite(504, 132, 'posters', randomPosterFrame).setOrigin(0.5).setScale(2).setVisible(false);
             poster.setDepth(4);
             poster.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
@@ -4245,7 +4251,7 @@ function toggleBrokerPanel() {
             // Random cat at (94,557)
             const catsFrameCount = (this.textures.get('cats')?.frameTotal || 1) - 1;
             const randomCatFrame = Math.floor(Math.random() * Math.max(1, catsFrameCount));
-            const cat = game.add.sprite(188, 1114, 'cats', randomCatFrame).setOrigin(0.5).setScale(2);
+            const cat = game.add.sprite(188, 1114, 'cats', randomCatFrame).setOrigin(0.5).setScale(2).setVisible(false);
             cat.setDepth(2000); // top layer
             cat.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
@@ -4257,7 +4263,7 @@ function toggleBrokerPanel() {
             });
 
             // Coffee machine at (659,397) - animated sprite + shadow
-            const coffeeMachineShadow = this.add.image(1318, 794, 'coffee_machine_shadow').setOrigin(0.5).setScale(2);
+            const coffeeMachineShadow = this.add.image(1318, 794, 'coffee_machine_shadow').setOrigin(0.5).setScale(2).setVisible(false);
             coffeeMachineShadow.setDepth(98);
             const coffeeFrameMax = Math.max(0, (this.textures.get('coffee_machine')?.frameTotal || 1) - 2);
             if (this.anims.exists('coffee_machine')) {
@@ -4269,7 +4275,7 @@ function toggleBrokerPanel() {
                 frameRate: 12.5,
                 repeat: -1
             });
-            const coffeeMachine = this.add.sprite(1318, 794, 'coffee_machine').setOrigin(0.5).setScale(2);
+            const coffeeMachine = this.add.sprite(1318, 794, 'coffee_machine').setOrigin(0.5).setScale(2).setVisible(false);
             coffeeMachine.setDepth(99);
             coffeeMachine.anims.play('coffee_machine', true);
 
@@ -4281,20 +4287,20 @@ function toggleBrokerPanel() {
                 frameRate: 6,
                 repeat: -1
             });
-            serverroom = this.add.sprite(2042, 284, 'serverroom', 0).setOrigin(0.5).setScale(2);
+            serverroom = this.add.sprite(2042, 284, 'serverroom', 0).setOrigin(0.5).setScale(2).setVisible(false);
             serverroom.setDepth(2);
             // 默认 idle: 静止第0帧
             serverroom.anims.stop();
             serverroom.setFrame(0);
 
             // Desk at (218,417) (v2)
-            const desk = this.add.image(436, 834, 'desk_v2').setScale(2).setOrigin(0.5);
+            const desk = this.add.image(436, 834, 'desk_v2').setScale(2).setOrigin(0.5).setVisible(false);
             desk.setDepth(1001);  // desk above starWorking
 
             // Random flower pot at (310,390), default scale 0.8 (top layer)
             const flowerFrameCount = Math.max(1, FLOWERS_FRAME_COLS * FLOWERS_FRAME_ROWS); // 动态帧数
             const randomFlowerFrame = Math.floor(Math.random() * flowerFrameCount);
-            const flower = this.add.sprite(620, 780, 'flowers', randomFlowerFrame).setOrigin(0.5).setScale(2);
+            const flower = this.add.sprite(620, 780, 'flowers', randomFlowerFrame).setOrigin(0.5).setScale(2).setVisible(false);
             flower.setScale(0.8);
             flower.setDepth(1100); // highest among desk/starWorking
             flower.setInteractive({ useHandCursor: true });
@@ -4323,14 +4329,14 @@ function toggleBrokerPanel() {
             });
 
             // Error bug character (moves between two points when state=error)
-            const errorBug = this.add.sprite(2014, 442, 'error_bug', 0).setOrigin(0.5).setScale(2);
+            const errorBug = this.add.sprite(2014, 442, 'error_bug', 0).setOrigin(0.5).setScale(2).setVisible(false);
             errorBug.setDepth(50); // above serverroom, below desk/bubbles
             errorBug.setVisible(false);
             errorBug.setScale(0.9); // shrink 10%
             errorBug.anims.play('error_bug', true);
             window.errorBug = errorBug;
             window.errorBugDir = 1; // 1 -> to right, -1 -> to left
-            const starWorking = this.add.sprite(434, 686, 'star_working', 0).setOrigin(0.5).setScale(2);
+            const starWorking = this.add.sprite(434, 686, 'star_working', 0).setOrigin(0.5).setScale(2).setVisible(false);
             starWorking.setVisible(false);
             starWorking.setScale(0.9);
             starWorking.setDepth(900);  // starWorking under desk so desk partially covers it
@@ -4354,7 +4360,7 @@ function toggleBrokerPanel() {
                 repeat: -1
             });
             }
-            syncAnimSprite = this.add.sprite(2314, 1184, 'sync_anim', 0).setOrigin(0.5).setScale(2);
+            syncAnimSprite = this.add.sprite(2314, 1184, 'sync_anim', 0).setOrigin(0.5).setScale(2).setVisible(false);
             syncAnimSprite.setDepth(40);
             // default show first frame only
             syncAnimSprite.anims.stop();
@@ -4415,8 +4421,9 @@ function toggleBrokerPanel() {
 
                 // 关键：先按高度 fit，再看是否需要按宽度微调，
                 // 保证既不会让画面歪，又能左右拖到最左最右边缘不被裁。
-                const fitHeightZoom = h / 720;
-                const candidateZoom = fitHeightZoom;
+                const fitHeightZoom = h / MAP_H;
+                const fitWidthZoom = w / MAP_W;
+                const candidateZoom = Math.min(fitHeightZoom, fitWidthZoom);
 
                 // 按 candidateZoom 计算：viewport 在世界坐标里的宽高
                 const viewW = w / candidateZoom;
@@ -4428,7 +4435,7 @@ function toggleBrokerPanel() {
 
                 // 仅在未手动平移过时才居中（避免把用户拖好的位置冲掉）
                 if (!hasManuallyPanned) {
-                    camera.centerOn(975, 360);
+                    camera.centerOn(MAP_W / 2, MAP_H / 2);
                 }
                 camera.scrollX = clamp(camera.scrollX, 0, maxX);
                 camera.scrollY = 0;
@@ -4443,7 +4450,7 @@ function toggleBrokerPanel() {
                 });
             }
 
-            camera.setBounds(0, 0, 2560, 720);
+            camera.setBounds(0, 0, 1280, 960);
             clampCameraScroll();
 
             function setPanEnabled(on) {
@@ -4566,44 +4573,54 @@ function toggleBrokerPanel() {
 
             // === 7 个 agent 固定工位（Phaser 画布内直接渲染）===
             const DESK_AGENTS = [
-                // 办公区 (520-1580), 填满 800 高度
-                // 上排 4 人 (y=200) — 间距 350px, Max 修复间距
-                { id: 'sky',      name: 'Sky 🌤️',  role: 1, x: 600,  y: 200 },
-                { id: 'manager',  name: 'K哥 📋',   role: 2, x: 850,  y: 200 },
-                { id: 'cto',      name: 'Pin哥 📌', role: 3, x: 1200, y: 200 },
-                { id: 'devops',   name: 'Max 🔧',   role: 4, x: 1550, y: 200 },
-                // 下排 3 人 (y=550) — 间距 400px
-                { id: 'backend',  name: '波哥 🌊',  role: 5, x: 650,  y: 550 },
-                { id: 'frontend', name: 'Jr 🎨',    role: 6, x: 1050, y: 550 },
-                { id: 'qa',       name: 'Yang 🧪',  role: 1, x: 1450, y: 550 },
+                // 分散到整张 1280x960 地图各区域
+                // 左上教室区 — 2 人 (椅子行 y≈400)
+                { id: 'sky',      name: 'Sky 🌤️',  char: 'adam',  x: 290,  y: 400 },
+                { id: 'frontend', name: 'Jr 🎨',    char: 'ash',   x: 540,  y: 400 },
+                // 上方中间区 — 1 人 (y=280 避免头顶裁切)
+                { id: 'cto',      name: 'Pin哥 📌', char: 'lucy',  x: 500,  y: 310 },
+                // 右上走廊/画廊区 — 1 人
+                { id: 'manager',  name: 'K哥 📋',   char: 'ash',   x: 960,  y: 300 },
+                // 左下会议室 — 1 人
+                { id: 'backend',  name: '波哥 🌊',  char: 'adam',  x: 380,  y: 680 },
+                // 右下办公区 — 2 人
+                { id: 'devops',   name: 'Max 🔧',   char: 'nancy', x: 1090, y: 560 },
+                { id: 'qa',       name: 'Yang 🧪',  char: 'lucy',  x: 1090, y: 820 },
             ];
 
-            // 创建 guest 动画 keys
-            for (let i = 1; i <= 6; i++) {
-                if (!this.anims.exists('guest_idle_' + i)) {
-                    this.anims.create({
-                        key: 'guest_idle_' + i,
-                        frames: this.anims.generateFrameNumbers('guest_role_' + i, { start: 0, end: 1 }),
-                        frameRate: 2, repeat: -1
-                    });
+            // 创建原版角色动画（atlas 格式）
+            const charNames = ['adam', 'ash', 'lucy', 'nancy'];
+            charNames.forEach(name => {
+                const cap = name.charAt(0).toUpperCase() + name.slice(1);
+                // sit_down 静态帧（坐姿面朝前）
+                // idle 动画（24帧）
+                if (!this.anims.exists('char_idle_' + name)) {
+                    const idleFrames = [];
+                    for (let i = 1; i <= 24; i++) {
+                        idleFrames.push({ key: 'char_' + name, frame: cap + '_idle_anim_' + i + '.png' });
+                    }
+                    this.anims.create({ key: 'char_idle_' + name, frames: idleFrames, frameRate: 8, repeat: -1 });
                 }
-                if (!this.anims.exists('guest_work_' + i)) {
-                    this.anims.create({
-                        key: 'guest_work_' + i,
-                        frames: this.anims.generateFrameNumbers('guest_anim_' + i, { start: 0, end: 1 }),
-                        frameRate: 4, repeat: -1
-                    });
+                // run 动画（24帧）
+                if (!this.anims.exists('char_run_' + name)) {
+                    const runFrames = [];
+                    for (let i = 1; i <= 24; i++) {
+                        runFrames.push({ key: 'char_' + name, frame: cap + '_run_' + i + '.png' });
+                    }
+                    this.anims.create({ key: 'char_run_' + name, frames: runFrames, frameRate: 10, repeat: -1 });
                 }
-            }
+            });
 
             window._deskAgentSprites = {};
             DESK_AGENTS.forEach(da => {
-                // 桌子（原版 desk_v2 sprite，陛下认可的样式）
-                const deskSprite = game.add.image(da.x, da.y + 12, 'desk_v2').setOrigin(0.5).setScale(1.5).setDepth(1500);
+                // 隐藏自定义桌子 — 使用 tilemap 原版桌子
+                // const deskSprite = game.add.image(da.x, da.y + 12, 'desk_v2').setOrigin(0.5).setScale(1.5).setDepth(1500);
 
-                // agent sprite（坐在桌前）— 使用 guest_anim 系列（32x32 帧，更精确）
-                const agentSprite = game.add.sprite(da.x, da.y, 'guest_role_' + da.role, 0).setOrigin(0.5).setScale(4.0).setDepth(1501);
-                // 不播放动画，使用静态帧 0
+                // agent sprite — 使用原版角色 atlas 坐姿
+                const charKey = 'char_' + da.char;
+                const cap = da.char.charAt(0).toUpperCase() + da.char.slice(1);
+                const sitFrame = cap + '_sit_down.png';
+                const agentSprite = game.add.sprite(da.x, da.y, charKey, sitFrame).setOrigin(0.5, 1).setScale(2.0).setDepth(1502);
                 agentSprite.setInteractive({ useHandCursor: true });
 
                 const agentId = da.id;
@@ -4615,9 +4632,9 @@ function toggleBrokerPanel() {
                 });
 
                 // 名字标签
-                const nameLabel = game.add.text(da.x, da.y - 95, da.name, {
+                const nameLabel = game.add.text(da.x, da.y - 55, da.name, {
                     fontFamily: 'ArkPixel, monospace',
-                    fontSize: '40px',
+                    fontSize: '22px',
                     fontStyle: 'bold',
                     fill: '#ffffff',
                     stroke: '#000000',
@@ -4627,34 +4644,18 @@ function toggleBrokerPanel() {
                 }).setOrigin(0.5).setDepth(1510);
 
                 // 状态标签
-                const stateLabel = game.add.text(da.x, da.y + 75, '工作中', {
+                const stateLabel = game.add.text(da.x, da.y + 20, '工作中', {
                     fontFamily: 'ArkPixel, monospace',
-                    fontSize: '30px',
+                    fontSize: '16px',
                     fill: '#22cc55',
                     stroke: '#000000',
                     strokeThickness: 4,
                 }).setOrigin(0.5).setDepth(1510);
 
-                window._deskAgentSprites[da.id] = { sprite: agentSprite, nameLabel: nameLabel, stateLabel: stateLabel, role: da.role };
+                window._deskAgentSprites[da.id] = { sprite: agentSprite, nameLabel: nameLabel, stateLabel: stateLabel, char: da.char };
             });
 
-            // 隐藏所有旧 Mountain Lodge sprite，只保留背景图和 DESK_AGENTS 工位
-            {
-                const keepSet = new Set();
-                Object.values(window._deskAgentSprites || {}).forEach(v => {
-                    if (v.sprite) keepSet.add(v.sprite);
-                    if (v.nameLabel) keepSet.add(v.nameLabel);
-                    if (v.stateLabel) keepSet.add(v.stateLabel);
-                });
-                const sc = game.scene.scenes[0];
-                sc.children.list.forEach(child => {
-                    if (!child || !child.texture) return;
-                    const key = child.texture.key;
-                    if (key === 'office_bg' || key === 'desk_v2') return;
-                    if (keepSet.has(child)) return;
-                    child.setVisible(false);
-                });
-            }
+            // 旧 sprite 清理已通过 setVisible(false) 处理
 
             // Max 修复：定期清除旧 guest sprite 残留（depth 2600 区域）
             // DESK_AGENTS 用 depth 1500-1510，旧 guest 用 2600-2601
@@ -5077,173 +5078,118 @@ function toggleBrokerPanel() {
           const old = document.getElementById('desk-overlay');
           if (old) old.remove();
 
-          const stateEmoji = {idle:'😴',writing:'💻',researching:'🔍',executing:'⚙️',syncing:'🔄',error:'🐛'};
-          const stateLabelMaps = {
-            zh: {idle:'待命',writing:'工作中',researching:'调研中',executing:'执行中',syncing:'同步中',error:'异常'},
-            en: {idle:'Idle',writing:'Working',researching:'Researching',executing:'Executing',syncing:'Syncing',error:'Error'},
-            ja: {idle:'待機',writing:'作業中',researching:'調査中',executing:'実行中',syncing:'同期中',error:'警報'}
-          };
-          const stateLabel = stateLabelMaps[uiLang||'zh'] || stateLabelMaps.zh;
-          const lobsterId = NAME_TO_LOBSTER_ID[name] || name.split(' ')[0].toLowerCase();
+          const stateLabelMap = {idle:'\u5f85\u547d',writing:'\u5de5\u4f5c\u4e2d',researching:'\u8c03\u7814\u4e2d',executing:'\u6267\u884c\u4e2d',syncing:'\u540c\u6b65\u4e2d',error:'\u5f02\u5e38'};
+          const stateEmoji = {idle:'\u{1f634}',writing:'\u{1f4bb}',researching:'\u{1f50d}',executing:'\u2699\ufe0f',syncing:'\u{1f504}',error:'\u{1f41b}'};
+          const lobsterId = (typeof NAME_TO_LOBSTER_ID !== 'undefined' ? NAME_TO_LOBSTER_ID[name] : null) || agentId;
 
-          window.openDeskView = openDeskView; const overlay = document.createElement('div');
+          const deskThemes = {
+            sky:     {color:'#4a90d9', items:['\u{1f4d6} Code Manual','\u2615 Americano','\u{1f3a7} Headphones']},
+            manager: {color:'#d4a44a', items:['\u{1f4cb} Progress','\u2615 Latte','\u{1f4f1} Phone']},
+            cto:     {color:'#e06050', items:['\u{1f4cc} Kanban','\u2615 Americano','\u{1f4da} Architecture']},
+            devops:  {color:'#a855f7', items:['\u{1f527} Toolkit','\u2615 Black Coffee','\u{1f50c} Cables']},
+            backend: {color:'#22c55e', items:['\u{1f30a} Ocean Mug','\u2615 Latte','\u{1f4d3} Notebook']},
+            frontend:{color:'#f59e0b', items:['\u{1f3a8} Design','\u2615 Latte','\u{1f58c}\ufe0f Stylus']},
+            qa:      {color:'#06b6d4', items:['\u{1f9ea} Test Report','\u2615 Green Tea','\u{1f41b} Bug List']},
+          };
+          const theme = deskThemes[agentId] || deskThemes.sky;
+
+          const overlay = document.createElement('div');
           overlay.id = 'desk-overlay';
-          overlay.style.cssText = `
-            position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;
-            background:rgba(0,0,0,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;
-            font-family:'ArkPixel',monospace;color:#e2e8f0;animation:deskFadeIn 0.3s ease;
-          `;
+          overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;font-family:ArkPixel,monospace;animation:deskFadeIn 0.3s ease;';
 
           overlay.innerHTML = `
             <style>
-              @keyframes deskFadeIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
-              @keyframes monitorGlow{0%,100%{box-shadow:0 0 30px rgba(0,255,170,0.2)}50%{box-shadow:0 0 50px rgba(0,255,170,0.4)}}
+              @keyframes deskFadeIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
               @keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
-              @keyframes rgbKeyboard{0%{border-bottom-color:#ff0055}33%{border-bottom-color:#00ffaa}66%{border-bottom-color:#00aaff}100%{border-bottom-color:#ff0055}}
-              @keyframes crtFlicker{0%{opacity:0.98}50%{opacity:1}100%{opacity:0.99}}
-              @keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
-
-              .desk-scene{width:1000px;max-width:95vw;position:relative;filter:drop-shadow(0 20px 40px rgba(0,0,0,0.8))}
-              .desk-top{background:url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop') center/cover;border-radius:16px 16px 0 0;padding:40px;display:flex;gap:30px;align-items:flex-end;min-height:450px;position:relative;border:1px solid rgba(255,255,255,0.1);border-bottom:none}
-              .desk-top::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(11,12,16,0.95) 0%,rgba(31,40,51,0.8) 100%);border-radius:16px 16px 0 0;}
-
-              /* RGB Keyboard Base */
-              .desk-top::after{content:'';position:absolute;bottom:10px;left:50%;transform:translateX(-50%) perspective(500px) rotateX(45deg);width:400px;height:120px;background:rgba(20,24,32,0.8);border-radius:8px;border:2px solid rgba(255,255,255,0.1);border-bottom:6px solid #00ffaa;animation:rgbKeyboard 5s linear infinite;box-shadow:0 20px 40px rgba(0,0,0,0.5)}
-
-              .monitor{flex:1;background:rgba(5,7,10,0.9);backdrop-filter:blur(10px);border-radius:12px;border:2px solid rgba(0,255,170,0.3);min-height:350px;padding:0;display:flex;flex-direction:column;animation:monitorGlow 4s infinite, crtFlicker 0.15s infinite;position:relative;z-index:2;box-shadow:inset 0 0 20px rgba(0,0,0,0.8)}
-
-              /* CRT Glass Overlay & Scanline */
-              .monitor::before{content:'';position:absolute;inset:0;background:linear-gradient(rgba(18,16,16,0) 50%,rgba(0,0,0,0.25) 50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06));background-size:100% 2px,3px 100%;pointer-events:none;z-index:10;border-radius:10px}
-              .monitor::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom, transparent, rgba(0,255,170,0.1), transparent);height:20px;animation:scanline 4s linear infinite;pointer-events:none;z-index:11}
-
-              .monitor-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(0,0,0,0.4);border-bottom:1px solid rgba(0,255,170,0.2);border-radius:10px 10px 0 0}
-              .monitor-dot{width:10px;height:10px;border-radius:50%;box-shadow:0 0 5px currentColor}
-
-              .monitor-content{flex:1;overflow-y:auto;font-size:14px;line-height:1.6;color:#a0aec0;padding:16px;font-family:'Courier New',Courier,monospace;position:relative;z-index:5}
-              .monitor-content::-webkit-scrollbar{width:6px}
-              .monitor-content::-webkit-scrollbar-thumb{background:rgba(0,255,170,0.3);border-radius:3px}
-              .line{padding:3px 0;text-shadow:0 0 2px currentColor}
-              .cmd{color:#00ffaa;font-weight:bold}
-              .out{color:#94a3b8}
-              .info{color:#00aaff}
-              .warn{color:#ffaa00}
-              .err{color:#ff0055}
-
-              .session-card{background:rgba(0,255,170,0.03);border:1px solid rgba(0,255,170,0.15);border-left:4px solid #00ffaa;border-radius:4px;padding:12px;margin:8px 0;cursor:pointer;transition:all 0.3s ease;position:relative;overflow:hidden}
-              .session-card::before{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(to right,transparent,rgba(0,255,170,0.1),transparent);transition:0.5s}
-              .session-card:hover::before{left:100%}
-              .session-card:hover{background:rgba(0,255,170,0.08);transform:translateX(5px);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
-
-              .session-label{color:#e2e8f0;font-size:14px;font-weight:bold;margin-bottom:4px}
-              .session-meta{color:#64748b;font-size:12px;display:flex;gap:12px;align-items:center}
-              .cursor-blink{animation:cursorBlink 1s infinite;background:#00ffaa;color:#000;padding:0 4px;margin-left:4px}
-
-              .desk-items{display:flex;flex-direction:column;gap:16px;width:130px;z-index:2;position:relative}
-              .desk-item{background:rgba(20,24,32,0.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:12px;text-align:center;font-size:13px;cursor:pointer;transition:all 0.3s;box-shadow:0 10px 20px rgba(0,0,0,0.4)}
-              .desk-item:hover{transform:translateY(-5px);border-color:rgba(0,255,170,0.3);box-shadow:0 15px 30px rgba(0,255,170,0.1)}
-              .desk-item .emoji{font-size:32px;display:block;margin-bottom:6px;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.5))}
-
-              /* Note item special style */
-              .desk-item.note{background:#fef3c7;color:#334155;transform:rotate(3deg);border:none}
-              .desk-item.note:hover{transform:rotate(0deg) scale(1.05)}
-
-              .desk-shelf{background:rgba(11,12,16,0.95);backdrop-filter:blur(20px);border-radius:0 0 16px 16px;padding:16px 40px;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(255,255,255,0.1);border-top:1px solid rgba(0,255,170,0.2);box-shadow:0 20px 40px rgba(0,0,0,0.6)}
-              .back-btn{background:transparent;color:#00ffaa;border:1px solid #00ffaa;padding:8px 24px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:14px;transition:all 0.3s;text-transform:uppercase;letter-spacing:1px}
-              .back-btn:hover{background:rgba(0,255,170,0.1);box-shadow:0 0 15px rgba(0,255,170,0.3)}
-
-              .agent-badge{display:flex;align-items:center;gap:12px;font-size:18px;font-weight:bold;letter-spacing:1px}
-              .status-pill{font-size:12px;padding:4px 12px;border-radius:4px;background:rgba(0,255,170,0.1);border:1px solid #00ffaa;color:#00ffaa;text-transform:uppercase;letter-spacing:1px;box-shadow:0 0 10px rgba(0,255,170,0.2)}
+              @keyframes screenGlow{0%,100%{box-shadow:0 0 15px rgba(0,150,255,0.15)}50%{box-shadow:0 0 25px rgba(0,150,255,0.25)}}
+              #f2-scene{position:relative;width:960px;max-width:95vw;aspect-ratio:960/640;border-radius:8px;overflow:hidden;image-rendering:pixelated;box-shadow:0 20px 60px rgba(0,0,0,0.7)}
+              #f2-scene .bg{width:100%;height:100%;display:block}
+              #f2-main-screen{position:absolute;left:30.8%;top:18.1%;width:31.0%;height:16.4%;overflow-y:auto;padding:6px;font-size:11px;color:#94a3b8;line-height:1.4;animation:screenGlow 3s infinite;border-radius:2px}
+              #f2-main-screen::-webkit-scrollbar{width:4px}
+              #f2-main-screen::-webkit-scrollbar-thumb{background:rgba(0,150,255,0.3);border-radius:2px}
+              #f2-sec-screen{position:absolute;left:65.6%;top:20.3%;width:19.8%;height:12.2%;overflow-y:auto;padding:4px;font-size:9px;color:#7c8da0;line-height:1.3;border-radius:2px}
+              .f2-cmd{color:#00ffaa;font-weight:bold}
+              .f2-info{color:#60a5fa}
+              .f2-warn{color:#f59e0b}
+              .f2-err{color:#ff0055}
+              .f2-session{background:rgba(0,255,170,0.05);border-left:2px solid #00ffaa;padding:4px 6px;margin:3px 0;border-radius:2px;cursor:pointer;transition:background 0.2s}
+              .f2-session:hover{background:rgba(0,255,170,0.12)}
+              .f2-session-title{color:#e2e8f0;font-size:11px;font-weight:bold}
+              .f2-session-meta{color:#64748b;font-size:9px}
+              #f2-badge{position:absolute;top:2%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);padding:4px 18px;border-radius:4px;font-size:14px;font-weight:bold;letter-spacing:1px;border:2px solid ${theme.color};color:${theme.color};text-shadow:0 0 8px ${theme.color}}
+              #f2-items{position:absolute;bottom:3%;left:5%;right:35%;display:flex;gap:8px}
+              #f2-items span{background:rgba(0,0,0,0.5);padding:3px 8px;border-radius:3px;color:#e2e8f0;font-size:10px;border:1px solid rgba(255,255,255,0.1)}
+              #f2-back{position:absolute;bottom:3%;right:3%;background:transparent;color:#00ffaa;border:2px solid #00ffaa;padding:5px 16px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;transition:all 0.2s}
+              #f2-back:hover{background:rgba(0,255,170,0.15)}
+              #f2-time{position:absolute;bottom:3.5%;right:15%;color:#64748b;font-size:10px}
             </style>
-            <div class="desk-scene">
-              <div class="desk-top">
-                <div class="monitor">
-                  <div class="monitor-header">
-                    <div class="monitor-dot" style="background:#ef4444"></div>
-                    <div class="monitor-dot" style="background:#f59e0b"></div>
-                    <div class="monitor-dot" style="background:#22c55e"></div>
-                    <span style="color:#64748b;font-size:12px;margin-left:8px">${name} - Terminal</span>
-                  </div>
-                  <div class="monitor-content" id="desk-terminal">
-                    <div class="line cmd">$ lobster agent --id ${lobsterId} --status</div>
-                    <div class="line info">状态: ${stateLabel[state]||state} ${stateEmoji[state]||''}</div>
-                    <div class="line out">任务: ${detail || '暂无'}</div>
-                    <div class="line cmd">$ lobster sessions --agent ${lobsterId}</div>
-                    <div class="line out" style="color:#475569">加载 session 列表中...<span class="cursor-blink">▌</span></div>
-                  </div>
-                </div>
-                <div class="desk-items">
-                  <div class="desk-item"><span class="emoji">☕</span>热咖啡</div>
-                  <div class="desk-item note"><span class="emoji">📌</span>Sprint Note</div>
-                  <div class="desk-item"><span class="emoji">🌱</span>盆栽</div>
-                  <div class="desk-item"><span class="emoji">🕐</span>${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</div>
-                </div>
+            <div id="f2-scene">
+              <img class="bg" src="data:image/png;base64,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" />
+              <div id="f2-badge">${(stateEmoji[state]||'') + ' ' + name + ' ' + (stateLabelMap[state]||state)}</div>
+              <div id="f2-main-screen">
+                <div class="f2-cmd">$ lobster status ${lobsterId}</div>
+                <div style="color:#475569">\u52a0\u8f7d\u4e2d...<span style="animation:cursorBlink 1s infinite;background:#00ffaa;color:#000;padding:0 2px">\u258c</span></div>
               </div>
-              <div class="desk-shelf">
-                <div class="agent-badge">
-                  ${stateEmoji[state]||'🧑‍💻'} <strong>${name}</strong>
-                  <span class="status-pill">${stateLabel[state]||state}</span>
-                </div>
-                <button class="back-btn" onclick="document.getElementById('desk-overlay').remove()">← 返回办公室</button>
+              <div id="f2-sec-screen">
+                <div style="color:#00ffaa;font-size:8px">SYSTEM</div>
+                <div style="color:#475569">\u52a0\u8f7d...</div>
               </div>
+              <div id="f2-items">${theme.items.map(i=>'<span>'+i+'</span>').join('')}</div>
+              <div id="f2-time">${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</div>
+              <button id="f2-back" onclick="document.getElementById('desk-overlay').remove()">\u2190 \u8fd4\u56de\u529e\u516c\u5ba4</button>
             </div>
           `;
           document.body.appendChild(overlay);
           overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
 
-          // Fetch real session data
           try {
-            const res = await fetch(LOBSTER_API + '/agents/' + lobsterId + '/sessions');
-            const data = await res.json();
-            const terminal = document.getElementById('desk-terminal');
-            if (!terminal) return;
-
-            const agent = data.agent || {};
-            const sessions = data.sessions || [];
+            const res = await fetch('/agents');
+            const allAgents = await res.json();
+            const agent = allAgents.find(a => a.agentId === lobsterId || a.name === name) || {};
+            const mainScreen = document.getElementById('f2-main-screen');
+            const secScreen = document.getElementById('f2-sec-screen');
+            if (!mainScreen) return;
 
             let html = '';
-            html += '<div class="line cmd">$ lobster agent --id ' + lobsterId + ' --status</div>';
-            html += '<div class="line info">📡 ' + (agent.name||name) + ' ' + (agent.emoji||'') + ' - ' + (agent.status||state) + '</div>';
-            html += '<div class="line out">活跃 session: ' + (agent.activeSessions||0) + '</div>';
-            html += '<div class="line cmd">$ lobster sessions --agent ' + lobsterId + ' --list</div>';
+            html += '<div class="f2-cmd">$ lobster agent --id ' + lobsterId + '</div>';
+            html += '<div class="f2-info">' + (agent.name||name) + ' - ' + (agent.state||state) + '</div>';
+            html += '<div style="color:#94a3b8">' + (agent.detail||'\u65e0\u4efb\u52a1') + '</div>';
+            html += '<div class="f2-cmd" style="margin-top:4px">$ lobster sessions</div>';
 
+            const sessions = agent.sessions || [];
             if (sessions.length === 0) {
-              html += '<div class="line warn">⚠ 暂无活跃 session</div>';
+              html += '<div class="f2-warn">\u26a0 \u6682\u65e0\u6d3b\u8dc3 session</div>';
             } else {
-              const MAX_SHOW = 8;
-              const showSessions = sessions.slice(0, MAX_SHOW);
-              showSessions.forEach((s, i) => {
+              sessions.slice(0, 6).forEach((s, i) => {
                 const label = s.label || s.sessionKey || 'unknown';
-                const short = label.length > 50 ? label.slice(0,47)+'...' : label;
-                const ago = s.lastActivity ? timeAgo(s.lastActivity) : '未知';
-                const kind = s.kind || 'unknown';
-                html += '<div class="session-card" onclick="alert(decodeURIComponent(\'' + encodeURIComponent(s.sessionKey||'') + '\'))">';
-                html += '<div class="session-label">' + (i+1) + '. ' + escHtml(short) + '</div>';
-                html += '<div class="session-meta">📌 ' + kind + ' · 🕐 ' + ago + ' · 📡 ' + (s.channel||'-') + '</div>';
+                const short = label.length > 35 ? label.slice(0,32)+'...' : label;
+                const ago = (typeof timeAgo === 'function') ? timeAgo(s.lastActivity) : '';
+                html += '<div class="f2-session">';
+                html += '<div class="f2-session-title">' + (i+1) + '. ' + short.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</div>';
+                html += '<div class="f2-session-meta">' + (s.kind||'') + ' \u00b7 ' + ago + '</div>';
                 html += '</div>';
               });
-              if (sessions.length > MAX_SHOW) {
-                html += '<div class="line info" style="margin-top:6px;cursor:pointer" onclick="this.parentElement.querySelectorAll(\'.hidden-session\').forEach(e=>e.style.display=\'block\');this.style.display=\'none\'">▶ 还有 ' + (sessions.length - MAX_SHOW) + ' 个 session，点击展开...</div>';
-                sessions.slice(MAX_SHOW).forEach((s, i) => {
-                  const label = s.label || s.sessionKey || 'unknown';
-                  const short = label.length > 50 ? label.slice(0,47)+'...' : label;
-                  const ago = s.lastActivity ? timeAgo(s.lastActivity) : '未知';
-                  const kind = s.kind || 'unknown';
-                  html += '<div class="session-card hidden-session" style="display:none" onclick="alert(decodeURIComponent(\'' + encodeURIComponent(s.sessionKey||'') + '\'))">';
-                  html += '<div class="session-label">' + (MAX_SHOW+i+1) + '. ' + escHtml(short) + '</div>';
-                  html += '<div class="session-meta">📌 ' + kind + ' · 🕐 ' + ago + ' · 📡 ' + (s.channel||'-') + '</div>';
-                  html += '</div>';
-                });
-              }
             }
-            html += '<div class="line out" style="margin-top:8px;color:#334155">- end of sessions -<span class="cursor-blink">▌</span></div>';
-            terminal.innerHTML = html;
+            html += '<div style="color:#334155;margin-top:4px">- end -<span style="animation:cursorBlink 1s infinite;background:#00ffaa;color:#000;padding:0 2px">\u258c</span></div>';
+            mainScreen.innerHTML = html;
+
+            // Secondary screen: system info
+            if (secScreen) {
+              let s2 = '<div style="color:#00ffaa;font-size:8px">SYSTEM MONITOR</div>';
+              s2 += '<div style="color:#60a5fa">Agent: ' + lobsterId + '</div>';
+              s2 += '<div>State: ' + (agent.state||'idle') + '</div>';
+              s2 += '<div>Area: ' + (agent.area||'-') + '</div>';
+              s2 += '<div>Auth: ' + (agent.authStatus||'-') + '</div>';
+              s2 += '<div style="color:#22c55e;margin-top:2px">\u25cf Online</div>';
+              secScreen.innerHTML = s2;
+            }
           } catch(e) {
-            const terminal = document.getElementById('desk-terminal');
-            if (terminal) {
-              terminal.innerHTML += '<div class="line err">❌ 无法连接 Lobster API: ' + e.message + '</div>';
-            }
+            const ms = document.getElementById('f2-main-screen');
+            if (ms) ms.innerHTML += '<div class="f2-err">\u274c ' + e.message + '</div>';
           }
         }
+
+
 
         function timeAgo(iso) {
           const diff = Date.now() - new Date(iso).getTime();
