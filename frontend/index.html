@@ -13,7 +13,7 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #aaaaac;
+            background: #b1b1b1;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -118,7 +118,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #aaaaac;
+            background: #b1b1b1;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -805,7 +805,7 @@
             padding-right: 4px;
         }
         #guest-agent-list::-webkit-scrollbar { width: 6px; }
-        #guest-agent-list::-webkit-scrollbar-track { background: #aaaaac; }
+        #guest-agent-list::-webkit-scrollbar-track { background: #b1b1b1; }
         #guest-agent-list::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
         .guest-agent-item {
             display: flex;
@@ -952,7 +952,7 @@
             width: 6px;
         }
         #memo-content::-webkit-scrollbar-track {
-            background: #aaaaac;
+            background: #b1b1b1;
         }
         #memo-content::-webkit-scrollbar-thumb {
             background: #444;
@@ -1550,7 +1550,7 @@
             height: 960,
             parent: 'game-container',
             pixelArt: true,
-            backgroundColor: '#aaaaac',
+            backgroundColor: '#b1b1b1',
             scale: {
                 mode: Phaser.Scale.FIT,
                 autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -4423,7 +4423,7 @@ function toggleBrokerPanel() {
                 // 保证既不会让画面歪，又能左右拖到最左最右边缘不被裁。
                 const fitHeightZoom = h / MAP_H;
                 const fitWidthZoom = w / MAP_W;
-                const candidateZoom = Math.min(fitHeightZoom, fitWidthZoom);
+                const candidateZoom = Math.min(fitHeightZoom, fitWidthZoom) * 0.88; // 12% padding
 
                 // 按 candidateZoom 计算：viewport 在世界坐标里的宽高
                 const viewW = w / candidateZoom;
@@ -4435,7 +4435,7 @@ function toggleBrokerPanel() {
 
                 // 仅在未手动平移过时才居中（避免把用户拖好的位置冲掉）
                 if (!hasManuallyPanned) {
-                    camera.centerOn(MAP_W / 2, MAP_H / 2);
+                    camera.centerOn(MAP_W / 2, MAP_H / 2 - 20); // 稍偏上，减少底部灰色空白
                 }
                 camera.scrollX = clamp(camera.scrollX, 0, maxX);
                 camera.scrollY = 0;
@@ -4450,7 +4450,7 @@ function toggleBrokerPanel() {
                 });
             }
 
-            camera.setBounds(0, 0, 1280, 960);
+            camera.setBounds(-100, -80, 1480, 1120);
             clampCameraScroll();
 
             function setPanEnabled(on) {
@@ -4578,9 +4578,9 @@ function toggleBrokerPanel() {
                 { id: 'sky',      name: 'Sky 🌤️',  char: 'adam',  x: 290,  y: 400 },
                 { id: 'frontend', name: 'Jr 🎨',    char: 'ash',   x: 540,  y: 400 },
                 // 上方中间区 — 1 人 (y=280 避免头顶裁切)
-                { id: 'cto',      name: 'Pin哥 📌', char: 'lucy',  x: 500,  y: 310 },
+                { id: 'cto',      name: 'Pin哥 📌', char: 'lucy',  x: 500,  y: 340 },
                 // 右上走廊/画廊区 — 1 人
-                { id: 'manager',  name: 'K哥 📋',   char: 'ash',   x: 960,  y: 300 },
+                { id: 'manager',  name: 'K哥 📋',   char: 'ash',   x: 960,  y: 340 },
                 // 左下会议室 — 1 人
                 { id: 'backend',  name: '波哥 🌊',  char: 'adam',  x: 380,  y: 680 },
                 // 右下办公区 — 2 人
