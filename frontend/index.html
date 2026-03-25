@@ -4022,6 +4022,11 @@ function toggleBrokerPanel() {
             this.load.spritesheet('guest_anim_4', '/static/guest_anim_4.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
             this.load.spritesheet('guest_anim_5', '/static/guest_anim_5.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
             this.load.spritesheet('guest_anim_6', '/static/guest_anim_6.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
+            // SkyOffice 坐姿角色（32x48 单帧）
+            this.load.image('char_adam_sit', '/static/char_adam_sit.png?v={{VERSION_TIMESTAMP}}');
+            this.load.image('char_ash_sit', '/static/char_ash_sit.png?v={{VERSION_TIMESTAMP}}');
+            this.load.image('char_lucy_sit', '/static/char_lucy_sit.png?v={{VERSION_TIMESTAMP}}');
+            this.load.image('char_nancy_sit', '/static/char_nancy_sit.png?v={{VERSION_TIMESTAMP}}');
         }
 
         function create() {
@@ -4220,22 +4225,22 @@ function toggleBrokerPanel() {
             // ====== 7 人固定工位 ======
             const DESK_AGENTS = [
                 // 上排 4人 (y=200)
-                { id: 'backend',  name: '波哥',  role: 5, x: 250,  y: 250 },
-                { id: 'sky',      name: 'Sky',   role: 1, x: 500,  y: 250 },
-                { id: 'cto',      name: 'Pin哥', role: 3, x: 750,  y: 250 },
-                { id: 'manager',  name: 'K哥',   role: 2, x: 1000, y: 250 },
+                { id: 'backend',  name: '波哥',  char: 'adam',  x: 250,  y: 250 },
+                { id: 'sky',      name: 'Sky',   char: 'adam',  x: 500,  y: 250 },
+                { id: 'cto',      name: 'Pin哥', char: 'lucy',  x: 750,  y: 250 },
+                { id: 'manager',  name: 'K哥',   char: 'ash',   x: 1000, y: 250 },
                 // 下排 3人 (y=500)
-                { id: 'devops',   name: 'Max',   role: 4, x: 370,  y: 500 },
-                { id: 'frontend', name: 'Jr',    role: 6, x: 640,  y: 500 },
-                { id: 'qa',       name: 'Yang',  role: 1, x: 910,  y: 500 },
+                { id: 'devops',   name: 'Max',   char: 'nancy', x: 370,  y: 500 },
+                { id: 'frontend', name: 'Jr',    char: 'ash',   x: 640,  y: 500 },
+                { id: 'qa',       name: 'Yang',  char: 'lucy',  x: 910,  y: 500 },
             ];
             window._deskAgentSprites = {};
             DESK_AGENTS.forEach(da => {
                 // 桌子
                 const deskSp = game.add.image(da.x, da.y + 12, 'desk_v2').setOrigin(0.5).setScale(1.5).setDepth(1500);
-                // 角色 sprite（静态帧 0）
-                const charKey = 'guest_role_' + da.role;
-                const agentSp = game.add.sprite(da.x, da.y, charKey, 0).setOrigin(0.5).setScale(4.0).setDepth(1502);
+                // SkyOffice 坐姿角色
+                const charKey = 'char_' + da.char + '_sit';
+                const agentSp = game.add.image(da.x, da.y - 10, charKey).setOrigin(0.5, 1).setScale(4.0).setDepth(1502);
                 agentSp.setInteractive({ useHandCursor: true });
                 agentSp.on('pointerdown', () => {
                     if (typeof openDeskView === 'function') openDeskView(da.id, da.name, 'idle', '');
