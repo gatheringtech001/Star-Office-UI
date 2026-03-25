@@ -7,68 +7,50 @@
     <style>
         @font-face {
             font-family: 'ArkPixel';
-            src: url('static/fonts/ark-pixel-12px-proportional-zh_cn.ttf.woff2') format('woff2');
+            src: url('/static/fonts/ark-pixel-12px-proportional-zh_cn.ttf.woff2') format('woff2');
             font-weight: normal;
             font-style: normal;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #b1b1b1;
+            background: #1a1a2e;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            align-items: stretch;
-            height: 100vh;
-            margin: 0;
+            align-items: center;
+            min-height: 100vh;
             font-family: 'ArkPixel', 'Courier New', monospace;
-            padding: 0;
-            gap: 0;
-            overflow: hidden;
+            padding: 20px 0;
+            gap: 10px;
+            overflow-x: hidden;
         }
         /* 底部面板容器 */
         #main-stage {
             position: relative;
-            display: flex;
-            flex-direction: row;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
+            width: 1280px;
             transition: transform .25s ease;
             will-change: transform;
         }
         body.drawer-open #main-stage {
+            /* 与右侧抽屉并列：按视口动态左移，确保与抽屉至少保留 20px 间隔 */
             transform: translateX(calc(-1 * max(0px, (min(320px, 92vw) + 20px) - ((100vw - 1280px) / 2))));
         }
         #bottom-panels {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 320px;
-            min-width: 320px;
-            max-width: 320px;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 10px;
-            background: rgba(15, 23, 42, 0.95);
-            border-left: 2px solid #334155;
-            flex-shrink: 0;
-        }
-        /* 侧边栏收起 */
-        body.sidebar-collapsed #bottom-panels {
-            display: none;
-        }
-        body.sidebar-collapsed #game-container {
-            width: 100vw !important;
-            flex: 1 1 auto !important;
+            gap: 20px;
+            width: 1280px;
+            max-width: none;
+            justify-content: flex-start;
+            margin-top: 20px;
         }
         #game-container {
             position: relative;
             border: 0;
             image-rendering: pixelated;
-            flex: 1 1 auto;
-            height: 100vh;
+            width: 1280px;
+            height: 720px;
             max-width: none;
-            max-height: 100vh;
+            max-height: none;
             aspect-ratio: auto;
             overflow: hidden;
         }
@@ -76,7 +58,9 @@
             width: 100% !important;
             height: 100% !important;
             image-rendering: pixelated;
-            object-fit: cover;
+            /* 再兜底一次：即使外层高度变化，也不要拉伸变形 */
+            object-fit: contain;
+            /* 边框改为直接贴合画布内部，避免“框比地图大” */
             box-shadow: inset 0 0 0 4px #64477d;
             position: relative;
             z-index: 10;
@@ -118,7 +102,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #b1b1b1;
+            background: #1a1a2e;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -388,7 +372,7 @@
             font-family:'ArkPixel', monospace;
         }
         .asset-vis-btn:hover { border-color:rgba(148, 163, 184, 0.38); color:#ecfccb; background:rgba(30,41,59,.92); }
-        .asset-thumb { width:56px; height:56px; object-fit: cover; background:#0b1220; border:1px solid rgba(148, 163, 184, 0.16); border-radius:6px; }
+        .asset-thumb { width:56px; height:56px; object-fit: contain; background:#0b1220; border:1px solid rgba(148, 163, 184, 0.16); border-radius:6px; }
         .asset-meta { line-height: 1.45; }
         .asset-path { color:#d1fae5; word-break: break-all; }
         .asset-sub { color:#9ca3af; font-size:11px; }
@@ -484,16 +468,16 @@
         }
         #asset-move-row .btn-move { color:#1f2937; }
         #asset-move-row .btn-move {
-            background-image:url('static/btn-move-house-sprite.png?v={{VERSION_TIMESTAMP}}');
+            background-image:url('/static/btn-move-house-sprite.png?v={{VERSION_TIMESTAMP}}');
         }
         #asset-move-row .btn-home {
-            background-image:url('static/btn-back-home-sprite.png?v={{VERSION_TIMESTAMP}}');
+            background-image:url('/static/btn-back-home-sprite.png?v={{VERSION_TIMESTAMP}}');
         }
         #asset-broker-row .btn-broker {
-            background-image:url('static/btn-broker-sprite.png?v={{VERSION_TIMESTAMP}}');
+            background-image:url('/static/btn-broker-sprite.png?v={{VERSION_TIMESTAMP}}');
         }
         #asset-broker-row .btn-diy {
-            background-image:url('static/btn-diy-sprite.png?v={{VERSION_TIMESTAMP}}');
+            background-image:url('/static/btn-diy-sprite.png?v={{VERSION_TIMESTAMP}}');
         }
         #asset-manual-panel {
             margin-top:0;
@@ -664,7 +648,7 @@
         #control-bar #btn-state-writing,
         #control-bar #btn-state-syncing,
         #control-bar #btn-state-error {
-            background-image: url('static/btn-state-sprite.png?v={{VERSION_TIMESTAMP}}');
+            background-image: url('/static/btn-state-sprite.png?v={{VERSION_TIMESTAMP}}');
             background-color: transparent !important;
             background-repeat: no-repeat;
             background-size: 300% 100%;
@@ -699,7 +683,7 @@
         }
         /* 装修房间按钮使用像素精灵皮肤 */
         #control-bar #btn-open-drawer {
-            background-image: url('static/btn-open-drawer-sprite.png?v={{VERSION_TIMESTAMP}}') !important;
+            background-image: url('/static/btn-open-drawer-sprite.png?v={{VERSION_TIMESTAMP}}') !important;
             background-color: transparent !important;
             background-repeat: no-repeat !important;
             background-size: 300% 100% !important;
@@ -805,7 +789,7 @@
             padding-right: 4px;
         }
         #guest-agent-list::-webkit-scrollbar { width: 6px; }
-        #guest-agent-list::-webkit-scrollbar-track { background: #b1b1b1; }
+        #guest-agent-list::-webkit-scrollbar-track { background: #1a1a2e; }
         #guest-agent-list::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
         .guest-agent-item {
             display: flex;
@@ -852,10 +836,9 @@
         /* Memo 区域 - 4:3 小正方形 */
         #memo-panel {
             position: relative;
-            width: 100%;
-            max-width: 300px;
-            height: 200px;
-            background-image: url('static/memo-bg.webp');
+            width: 460px;
+            height: 300px;
+            background-image: url('/static/memo-bg.webp');
             background-size: cover;
             background-position: center;
             border: 4px solid #0e1119;
@@ -952,7 +935,7 @@
             width: 6px;
         }
         #memo-content::-webkit-scrollbar-track {
-            background: #b1b1b1;
+            background: #1a1a2e;
         }
         #memo-content::-webkit-scrollbar-thumb {
             background: #444;
@@ -1150,19 +1133,18 @@
 <body>
     <!-- 加载遮罩 -->
     <div id="loading-overlay">
-        <div id="loading-text">Loading Star\u0027s pixel office...</div>
+        <div id="loading-text">Loading Star’s pixel office...</div>
         <div id="loading-progress-container">
             <div id="loading-progress-bar"></div>
         </div>
     </div>
-
+    
     <div id="main-stage">
         <div id="game-container">
             <div id="game-skeleton"><div class="hint">正在进入像素办公室…</div></div>
-            <div id="status-text" style="display:none;">加载中...</div>
-            <button id="sidebar-toggle" onclick="document.body.classList.toggle('sidebar-collapsed')" style="position:absolute;top:10px;right:10px;z-index:9999;background:rgba(0,0,0,0.7);color:#fff;border:1px solid #475569;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px;font-family:ArkPixel,monospace;">☰ 面板</button>
+            <div id="status-text">加载中...</div>
         </div>
-
+    
     <!-- 底部面板容器 -->
     <div id="bottom-panels">
         <!-- Memo 面板 -->
@@ -1175,10 +1157,10 @@
             </div>
             <div class="memo-decoration">─ ─ ─ ─ ─</div>
         </div>
-
+        
         <!-- 状态控制栏 -->
         <div id="control-bar">
-            <div id="control-bar-title">团队状态</div>
+            <div id="control-bar-title">Star 状态</div>
             <div id="control-buttons">
                 <button id="btn-state-idle" onclick="setState('idle','待命')">待命</button>
                 <button id="btn-state-writing" onclick="setState('writing','工作中')">工作</button>
@@ -1197,7 +1179,7 @@
             </div>
         </div>
     </div>
-
+    
     <div id="asset-highlight"></div>
     <div id="room-loading-overlay" aria-live="polite" aria-busy="true">
         <div class="room-loading-inner">
@@ -1300,16 +1282,18 @@
         移动视野
     </button>
     <div id="lang-toggle-group" style="position:fixed; top:calc(env(safe-area-inset-top, 0px) + 52px); left:12px; z-index:1000002; display:flex; gap:2px; align-items:center;">
-        <!-- 语言切换已移除，锁定中文 -->
+        <button id="lang-btn-en" onclick="setUILanguage('en')" style="padding:8px 10px; font-family:ArkPixel,monospace; font-size:13px; cursor:pointer; border:2px solid #333; border-radius:5px; background:#333; color:#fff;">EN</button>
+        <button id="lang-btn-jp" onclick="setUILanguage('ja')" style="padding:8px 10px; font-family:ArkPixel,monospace; font-size:13px; cursor:pointer; border:2px solid #333; border-radius:5px; background:#333; color:#fff;">JP</button>
+        <button id="lang-btn-cn" onclick="setUILanguage('zh')" style="padding:8px 10px; font-family:ArkPixel,monospace; font-size:13px; cursor:pointer; border:2px solid #333; border-radius:5px; background:#333; color:#fff;">CN</button>
     </div>
 
-    <script src="static/vendor/phaser-3.80.1.min.js?v={{VERSION_TIMESTAMP}}"></script>
+    <script src="/static/vendor/phaser-3.80.1.min.js?v={{VERSION_TIMESTAMP}}"></script>
     <script>
         // 简易中英文切换
-        let uiLang = 'zh'; // 锁定中文
+        let uiLang = localStorage.getItem('uiLang') || 'en';
         const I18N = {
             zh: {
-                controlTitle: '团队状态',
+                controlTitle: 'Star 状态',
                 btnIdle: '待命', btnWork: '工作', btnSync: '同步', btnError: '报警', btnDecor: '装修房间',
                 drawerTitle: '装修房间 · 资产侧边栏', drawerClose: '关闭',
                 authTitle: '请输入装修验证码', authPlaceholder: '输入验证码', authVerify: '验证', authDefaultPassHint: '默认密码：1234（可随时让我帮你改，建议改成强密码）',
@@ -1318,7 +1302,7 @@
                 assetHide: '隐藏', assetShow: '显示',
                 resetToDefault: '重置为默认资产', restorePrevAsset: '用上一版',
                 btnMove: '📦 搬新家', btnHome: '🐚 回老家', btnHomeLast: '↩️ 回上一个家', btnHomeFavorite: '⭐ 收藏这个家', btnBroker: '🤝 找中介', btnDIY: '🪚 自己装', btnBrokerGo: '听中介的',
-                homeFavTitle: '🏠 收藏的家', homeFavEmpty: '还没有收藏，先点"⭐ 收藏这个家"', homeFavApply: '替换到当前地图', homeFavDelete: '删除', homeFavSaved: '✅ 已收藏当前地图', homeFavApplied: '✅ 已替换为收藏地图', homeFavDeleted: '🗑️ 已删除收藏',
+                homeFavTitle: '🏠 收藏的家', homeFavEmpty: '还没有收藏，先点“⭐ 收藏这个家”', homeFavApply: '替换到当前地图', homeFavDelete: '删除', homeFavSaved: '✅ 已收藏当前地图', homeFavApplied: '✅ 已替换为收藏地图', homeFavDeleted: '🗑️ 已删除收藏',
                 brokerHint: '你会给龙虾推荐什么样的房子',
                 brokerPromptPh: '例如：故宫主题、莫奈风格、地牢主题、兵马俑主题……',
                 brokerNeedPrompt: '请先输入中介方案描述',
@@ -1334,7 +1318,6 @@
                 assetHintDefault: '通用素材：建议保持原图尺寸、透明通道与视觉重心一致，避免错位或失真',
                 showCoords: '显示坐标', hideCoords: '隐藏坐标', moveView: '移动视野', lockView: '锁定视野',
                 memoTitle: '昨 日 小 记', guestTitle: '访 客 列 表', officeTitle: '海辛小龙虾的办公室',
-                noMemo: '暂无昨日日记', noGuest: '暂无访客',
                 loadingOffice: '正在加载 Star 的像素办公室...'
             },
             en: {
@@ -1347,7 +1330,7 @@
                 assetHide: 'Hide', assetShow: 'Show',
                 resetToDefault: 'Reset to Default', restorePrevAsset: 'Use Previous',
                 btnMove: '📦 New Home', btnHome: '🐚 Go Home', btnHomeLast: '↩️ Last One', btnHomeFavorite: '⭐ Save This Home', btnBroker: '🤝 Broker', btnDIY: '🪚 DIY', btnBrokerGo: 'Follow Broker',
-                homeFavTitle: '🏠 Saved Homes', homeFavEmpty: 'No saved homes yet. Tap "⭐ Save This Home" first.', homeFavApply: 'Apply to Current Map', homeFavDelete: 'Delete', homeFavSaved: '✅ Current map saved', homeFavApplied: '✅ Applied saved home', homeFavDeleted: '🗑️ Saved home deleted',
+                homeFavTitle: '🏠 Saved Homes', homeFavEmpty: 'No saved homes yet. Tap “⭐ Save This Home” first.', homeFavApply: 'Apply to Current Map', homeFavDelete: 'Delete', homeFavSaved: '✅ Current map saved', homeFavApplied: '✅ Applied saved home', homeFavDeleted: '🗑️ Saved home deleted',
                 brokerHint: 'What kind of house would you recommend for Lobster?',
                 brokerPromptPh: 'e.g. Forbidden City theme, Monet style, dungeon theme, Terracotta Warriors theme...',
                 brokerNeedPrompt: 'Please enter broker style prompt first',
@@ -1363,8 +1346,7 @@
                 assetHintDefault: 'Generic asset: keep source size, alpha channel, and visual anchor to avoid drift/distortion',
                 showCoords: 'Show Coords', hideCoords: 'Hide Coords', moveView: 'Pan View', lockView: 'Lock View',
                 memoTitle: 'YESTERDAY NOTES', guestTitle: 'VISITOR LIST', officeTitle: 'Haixin Lobster Office',
-                noMemo: 'No notes from yesterday', noGuest: 'No visitors',
-                loadingOffice: 'Loading Star\u0027s pixel office...'
+                loadingOffice: 'Loading Star’s pixel office...'
             },
             ja: {
                 controlTitle: 'Star ステータス',
@@ -1392,7 +1374,6 @@
                 assetHintDefault: '汎用素材：元サイズ・透過・視覚アンカーを維持し、ズレや崩れを防いでください',
                 showCoords: '座標表示', hideCoords: '座標非表示', moveView: '視点移動', lockView: '視点固定',
                 memoTitle: '昨日のメモ', guestTitle: '訪問者リスト', officeTitle: 'ハイシン・ロブスターのオフィス',
-                noMemo: '昨日のメモはありません', noGuest: '訪問者はいません',
                 loadingOffice: 'Star のピクセルオフィスを読み込み中...'
             }
         };
@@ -1409,7 +1390,7 @@
         function ensureMemoBgVisible() {
             const panel = document.getElementById('memo-panel');
             if (!panel) return;
-            panel.style.backgroundImage = "url('static/memo-bg.webp?v={{VERSION_TIMESTAMP}}')";
+            panel.style.backgroundImage = "url('/static/memo-bg.webp?v={{VERSION_TIMESTAMP}}')";
             panel.classList.remove('no-bg');
         }
 
@@ -1478,9 +1459,8 @@
             if (memoTitle) memoTitle.textContent = t('memoTitle');
             const guestTitle = document.getElementById('guest-agent-panel-title');
             if (guestTitle) guestTitle.textContent = t('guestTitle');
-            const plaqueTitle = (typeof window.officeNameFromServer !== 'undefined' && window.officeNameFromServer) || t('officeTitle');
             if (window.officePlaqueText && window.officePlaqueText.setText) {
-                window.officePlaqueText.setText(plaqueTitle);
+                window.officePlaqueText.setText(t('officeTitle'));
             }
 
             const coordsBtn = document.getElementById('coords-toggle');
@@ -1519,7 +1499,7 @@
 
         // 检测浏览器是否支持 WebP
         let supportsWebP = false;
-
+        
         // 方法 1: 使用 canvas 检测
         function checkWebPSupport() {
             return new Promise((resolve) => {
@@ -1531,7 +1511,7 @@
                 }
             });
         }
-
+        
         // 方法 2: 使用 image 检测（备用）
         function checkWebPSupportFallback() {
             return new Promise((resolve) => {
@@ -1547,15 +1527,15 @@
         const config = {
             type: Phaser.AUTO,
             width: 1280,
-            height: 960,
+            height: 720,
             parent: 'game-container',
             pixelArt: true,
-            backgroundColor: '#b1b1b1',
+            // 桌面端保持 FIT；手机端用 RESIZE，并在相机里按高度做 fit（可横向 pan）
             scale: {
-                mode: Phaser.Scale.RESIZE,
+                mode: IS_TOUCH_DEVICE ? Phaser.Scale.RESIZE : Phaser.Scale.FIT,
                 autoCenter: Phaser.Scale.CENTER_BOTH,
                 width: 1280,
-                height: 960
+                height: 720
             },
             physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
             scene: { preload: preload, create: create, update: update }
@@ -1569,16 +1549,16 @@
         async function loadMemo() {
             const memoDate = document.getElementById('memo-date');
             const memoContent = document.getElementById('memo-content');
-
+            
             try {
-                const response = await fetch('yesterday-memo?t=' + Date.now(), { cache: 'no-store' });
+                const response = await fetch('/yesterday-memo?t=' + Date.now(), { cache: 'no-store' });
                 const data = await response.json();
-
+                
                 if (data.success && data.memo) {
                     memoDate.textContent = data.date || '';
                     memoContent.innerHTML = data.memo.replace(/\n/g, '<br>');
                 } else {
-                    memoContent.innerHTML = '<div id="memo-placeholder">' + t('noMemo') + '</div>';
+                    memoContent.innerHTML = '<div id="memo-placeholder">暂无昨日日记</div>';
                 }
             } catch (e) {
                 console.error('加载 memo 失败:', e);
@@ -1622,13 +1602,13 @@
             }, 260);
         }
 
-        // 兜底：某些移动网络/CDN 抖动时，避免一直卡在"加载中"遮罩
+        // 兜底：某些移动网络/CDN 抖动时，避免一直卡在“加载中”遮罩
         setTimeout(() => {
             if (loadingOverlay && loadingOverlay.style.display !== 'none') {
                 hideLoadingOverlay();
             }
         }, 8000);
-
+        
         // 懒加载逻辑已取消（体验优先：装饰首屏直接出现）
 
         const STATES = {
@@ -1642,7 +1622,7 @@
 
         const BUBBLE_TEXTS = {
             zh: {
-                idle: ['待命中：耳朵竖起来了','我在这儿，随时可以开工','先把桌面收拾干净再说','呼--给大脑放个风','今天也要优雅地高效','等待，是为了更准确的一击','咖啡还热，灵感也还在','我在后台给你加 Buff','状态：静心 / 充电','小猫说：慢一点也没关系'],
+                idle: ['待命中：耳朵竖起来了','我在这儿，随时可以开工','先把桌面收拾干净再说','呼——给大脑放个风','今天也要优雅地高效','等待，是为了更准确的一击','咖啡还热，灵感也还在','我在后台给你加 Buff','状态：静心 / 充电','小猫说：慢一点也没关系'],
                 writing: ['进入专注模式：勿扰','先把关键路径跑通','我来把复杂变简单','把 bug 关进笼子里','写到一半，先保存','把每一步都做成可回滚','今天的进度，明天的底气','先收敛，再发散','让系统变得更可解释','稳住，我们能赢'],
                 researching: ['我在挖证据链','让我把信息熬成结论','找到了：关键在这里','先把变量控制住','我在查：它为什么会这样','把直觉写成验证','先定位，再优化','别急，先画因果图'],
                 executing: ['执行中：不要眨眼','把任务切成小块逐个击破','开始跑 pipeline','一键推进：走你','让结果自己说话','先做最小可行，再做最美版本'],
@@ -1651,13 +1631,13 @@
                 cat: ['喵~','咕噜咕噜…','尾巴摇一摇','晒太阳最开心','有人来看我啦','我是这个办公室的吉祥物','伸个懒腰','今天的罐罐准备好了吗','呼噜呼噜','这个位置视野最好']
             },
             en: {
-                idle: ['On standby: ears up.','I\u0027m here, ready to roll.','Let\u0027s tidy the desk first.','Taking a quick brain breeze.','Efficient and elegant, as always.','Waiting for a more precise strike.','Coffee is warm, ideas too.','Giving you a quiet backstage buff.','Status: calm / charging.','Cat says: no rush, we\u0027re good.'],
-                writing: ['Focus mode on: do not disturb.','Let\u0027s clear the critical path first.','I\u0027ll make the complex simple.','Putting bugs in a cage.','Save first, then continue.','Every step should be rollback-safe.','Today\u0027s progress is tomorrow\u0027s confidence.','Converge first, then diverge.','Making the system more explainable.','Steady-this is winnable.'],
-                researching: ['Digging the evidence chain.','Let me boil info into conclusions.','Found it: key clue here.','Control variables first.','Checking why this happens.','Turn intuition into verification.','Locate first, optimize next.','No rush-draw the causality map first.'],
-                executing: ['Executing-don\u0027t blink.','Split tasks, conquer one by one.','Pipeline is running.','One-click push: go go.','Let the results speak.','Build MVP first, then craft beauty.'],
-                syncing: ['Syncing: lock today into the cloud.','Backup is safety, not ceremony.','Writing… don\u0027t cut power.','Handing changes to timestamps.','Cloud alignment: click.','Don\u0027t shake it before sync finishes.','Saving future-us from disasters.','One more backup, one less regret.'],
-                error: ['Alarm on-stay calm.','I can smell a bug.','Reproduce first, then fix.','Give me logs; I\u0027ll translate.','Errors are clues, not enemies.','Circle the impact area first.','Stop the bleeding, then surgery.','On it: tracing root cause now.','Don\u0027t worry, seen this many times.','Alert mode: make the issue reveal itself.'],
-                cat: ['Meow~','Purr purr…','Tail wiggle activated.','Sunbathing is the best.','Someone came to see me!','I\u0027m the office mascot.','Big stretch~','Is today\u0027s snack ready yet?','Rrrrr purr…','Best view spot secured.']
+                idle: ['On standby: ears up.','I’m here, ready to roll.','Let’s tidy the desk first.','Taking a quick brain breeze.','Efficient and elegant, as always.','Waiting for a more precise strike.','Coffee is warm, ideas too.','Giving you a quiet backstage buff.','Status: calm / charging.','Cat says: no rush, we’re good.'],
+                writing: ['Focus mode on: do not disturb.','Let’s clear the critical path first.','I’ll make the complex simple.','Putting bugs in a cage.','Save first, then continue.','Every step should be rollback-safe.','Today’s progress is tomorrow’s confidence.','Converge first, then diverge.','Making the system more explainable.','Steady—this is winnable.'],
+                researching: ['Digging the evidence chain.','Let me boil info into conclusions.','Found it: key clue here.','Control variables first.','Checking why this happens.','Turn intuition into verification.','Locate first, optimize next.','No rush—draw the causality map first.'],
+                executing: ['Executing—don’t blink.','Split tasks, conquer one by one.','Pipeline is running.','One-click push: go go.','Let the results speak.','Build MVP first, then craft beauty.'],
+                syncing: ['Syncing: lock today into the cloud.','Backup is safety, not ceremony.','Writing… don’t cut power.','Handing changes to timestamps.','Cloud alignment: click.','Don’t shake it before sync finishes.','Saving future-us from disasters.','One more backup, one less regret.'],
+                error: ['Alarm on—stay calm.','I can smell a bug.','Reproduce first, then fix.','Give me logs; I’ll translate.','Errors are clues, not enemies.','Circle the impact area first.','Stop the bleeding, then surgery.','On it: tracing root cause now.','Don’t worry, seen this many times.','Alert mode: make the issue reveal itself.'],
+                cat: ['Meow~','Purr purr…','Tail wiggle activated.','Sunbathing is the best.','Someone came to see me!','I’m the office mascot.','Big stretch~','Is today’s snack ready yet?','Rrrrr purr…','Best view spot secured.']
             },
             ja: {
                 idle: ['待機中：耳はピン。','ここにいるよ、いつでも開始OK。','まず机を整えよう。','ふー、頭に風を通す。','今日も上品に高効率で。','待つのは、より正確な一撃のため。','コーヒーも発想もまだ温かい。','裏側でそっとバフ中。','状態：静心 / 充電。','猫より：ゆっくりでも大丈夫。'],
@@ -1671,7 +1651,7 @@
         };
 
         let game, star, sofa, serverroom, officeBgSprite, areas = {}, currentState = 'idle', pendingDesiredState = null, statusText, lastFetch = 0, lastBlink = 0, lastBubble = 0, targetX = 660, targetY = 170, bubble = null, typewriterText = '', typewriterTarget = '', typewriterIndex = 0, lastTypewriter = 0, syncAnimSprite = null, syncAnimPlayable = false, catBubble = null, selectionBoxGraphics = null;
-        const IDLE_SOFA_ANCHOR = { x: 798 * 2, y: 272 * 2 }; // 统一中心锚点（原 sofa 左上 670,144 的中心）
+        const IDLE_SOFA_ANCHOR = { x: 798, y: 272 }; // 统一中心锚点（原 sofa 左上 670,144 的中心）
         const IDLE_STAR_SCALE = 1.0; // star idle 改为256帧原生显示，不再放大
         // flowers 精灵表规格：固定单帧 128x128，4x4
         let FLOWERS_FRAME_W = 65;
@@ -1744,7 +1724,7 @@
 
         // 状态控制栏函数（用于测试）
         function setState(state, detail) {
-            fetch('set_state', {
+            fetch('/set_state', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ state, detail })
@@ -1782,7 +1762,7 @@
                 return;
             }
             try {
-                const res = await fetch('assets/auth', {
+                const res = await fetch('/assets/auth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: val })
@@ -2184,12 +2164,12 @@
                 let serverPositions = {};
                 let serverDefaults = {};
                 try {
-                    const res = await fetch('assets/positions?t=' + Date.now(), { cache: 'no-store' });
+                    const res = await fetch('/assets/positions?t=' + Date.now(), { cache: 'no-store' });
                     const data = await res.json();
                     if (data && data.ok && data.items) serverPositions = data.items;
                 } catch (e) {}
                 try {
-                    const res2 = await fetch('assets/defaults?t=' + Date.now(), { cache: 'no-store' });
+                    const res2 = await fetch('/assets/defaults?t=' + Date.now(), { cache: 'no-store' });
                     const data2 = await res2.json();
                     if (data2 && data2.ok && data2.items) serverDefaults = data2.items;
                 } catch (e) {}
@@ -2306,7 +2286,7 @@
             // 先看命名是否属于精灵表
             const inferred = inferSpritesheetFrameMetaByPath(item?.path || '');
             if (!inferred) return null;
-            // 仅返回"是精灵表"的信号，单帧尺寸后续自动推断
+            // 仅返回“是精灵表”的信号，单帧尺寸后续自动推断
             return { w: null, h: null, isSheet: true };
         }
 
@@ -2466,7 +2446,7 @@
             clearAssetThumbTimers();
 
             if (rows.length === 0) {
-                list.innerHTML = '<div class="asset-sub" style="padding:8px">暂无资产（可点"刷新"重试）</div>';
+                list.innerHTML = '<div class="asset-sub" style="padding:8px">暂无资产（可点“刷新”重试）</div>';
                 return;
             }
 
@@ -2508,7 +2488,7 @@
             const out = document.getElementById('asset-upload-result');
             try {
                 const selectedPath = (selectedAssetInfo && selectedAssetInfo.path) ? selectedAssetInfo.path : '';
-                const res = await fetch('assets/list?t=' + Date.now(), { cache: 'no-store' });
+                const res = await fetch('/assets/list?t=' + Date.now(), { cache: 'no-store' });
                 const data = await res.json();
                 assetListData = data.items || [];
 
@@ -2530,7 +2510,7 @@
                 }
             } catch (e) {
                 console.error('加载资产列表失败', e);
-                if (out) out.textContent = '❌ 资产加载失败，请点"刷新"重试';
+                if (out) out.textContent = '❌ 资产加载失败，请点“刷新”重试';
             }
         }
 
@@ -2677,7 +2657,7 @@
             }
 
             out.textContent = '⏳ 正在上传并替换，请稍候...';
-            const res = await fetch('assets/upload', { method: 'POST', body: fd });
+            const res = await fetch('/assets/upload', { method: 'POST', body: fd });
             const data = await res.json();
             if (!data.ok) {
                 out.textContent = `❌ 更新失败：${data.msg || res.status}`;
@@ -2784,23 +2764,23 @@ function toggleBrokerPanel() {
                     '正在给钳子装上远行 Buff……',
                     '正在匹配下一段创作气候……',
                     '正在把时差调成冒险模式……',
-                    '正在接收陌生街区的 Wi-Fi 心跳……',
+                    '正在接收陌生街区的 Wi‑Fi 心跳……',
                     '正在试播下一站的海风 BGM……',
-                    '正在加载"也许会爱上"的新房间……',
+                    '正在加载“也许会爱上”的新房间……',
                     '正在为未知邻居准备自我介绍……',
                     '正在解锁下一片数字海域……',
                     '正在把好奇心调到满格……',
                     '正在等待旅程投递下一张门牌号……'
                 ],
                 en: [
-                    'Packing today\u0027s luggage of inspiration…',
+                    'Packing today’s luggage of inspiration…',
                     'Drawing the digital coordinates for the next stop…',
                     'Checking the destination of this drift…',
                     'Folding the office into portable mode…',
                     'Installing a travel buff on the claws…',
                     'Matching the creative climate for the next chapter…',
                     'Switching the time zone to adventure mode…',
-                    'Receiving Wi-Fi heartbeats from an unfamiliar block…',
+                    'Receiving Wi‑Fi heartbeats from an unfamiliar block…',
                     'Previewing the sea-breeze BGM of the next stop…',
                     'Loading a new room you might just fall in love with…',
                     'Preparing an intro for unknown neighbors…',
@@ -2816,7 +2796,7 @@ function toggleBrokerPanel() {
                     'ハサミに遠征 Buff を装着しています……',
                     '次の創作区間の気候をマッチングしています……',
                     '時差を冒険モードに切り替えています……',
-                    '見知らぬ街区の Wi-Fi ハートビートを受信しています……',
+                    '見知らぬ街区の Wi‑Fi ハートビートを受信しています……',
                     '次の目的地の潮風 BGM を試聴しています……',
                     '「好きになるかもしれない」新しい部屋を読み込んでいます……',
                     '未知のご近所さん向けに自己紹介を準備しています……',
@@ -2867,13 +2847,13 @@ function toggleBrokerPanel() {
 
         async function ensureGeminiConfigLoaded() {
             try {
-                const authRes = await fetch('assets/auth/status', { cache: 'no-store' });
+                const authRes = await fetch('/assets/auth/status', { cache: 'no-store' });
                 const authData = await authRes.json();
                 assetDrawerAuthed = !!(authData && authData.ok && authData.authed);
                 updateAssetAuthUI();
                 if (!assetDrawerAuthed) return;
 
-                const res = await fetch('config/gemini', { cache: 'no-store' });
+                const res = await fetch('/config/gemini', { cache: 'no-store' });
                 const data = await res.json();
                 if (data && data.ok) {
                     window.geminiConfig = {
@@ -2901,7 +2881,7 @@ function toggleBrokerPanel() {
                 return;
             }
             try {
-                const res = await fetch('config/gemini', {
+                const res = await fetch('/config/gemini', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ api_key: key, model: 'nanobanana-pro' })
@@ -2935,14 +2915,14 @@ function toggleBrokerPanel() {
 
         // Async generation: start task then poll for result (avoids Cloudflare 524 timeout)
         async function _startAndPollGeneration(body, out, progressMsg) {
-            const res = await fetch('assets/generate-rpg-background', {
+            const res = await fetch('/assets/generate-rpg-background', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
             });
             const data = await res.json();
             if (!data.ok) return data;
-            if (!data.async || !data.task_id) return data; // sync fallback (shouldn\u0027t happen)
+            if (!data.async || !data.task_id) return data; // sync fallback (shouldn't happen)
 
             // Poll for completion
             const taskId = data.task_id;
@@ -2957,7 +2937,7 @@ function toggleBrokerPanel() {
                 const elapsed = Math.round((Date.now() - startTime) / 1000);
                 out.textContent = progressMsg + '（已等待 ' + elapsed + '秒）' + '.'.repeat(dots);
                 try {
-                    const pollRes = await fetch('assets/generate-rpg-background/poll?task_id=' + encodeURIComponent(taskId));
+                    const pollRes = await fetch('/assets/generate-rpg-background/poll?task_id=' + encodeURIComponent(taskId));
                     const pollData = await pollRes.json();
                     if (pollData.status === 'pending') continue;
                     return pollData; // done or error
@@ -3068,7 +3048,7 @@ function toggleBrokerPanel() {
             showRoomLoadingOverlay();
             out.textContent = '🏡 正在回老家（恢复初始底图）...';
             try {
-                const res = await fetch('assets/restore-reference-background', { method: 'POST' });
+                const res = await fetch('/assets/restore-reference-background', { method: 'POST' });
                 const data = await res.json();
                 if (!data.ok) {
                     out.textContent = `❌ 恢复失败：${data.msg || res.status}`;
@@ -3103,7 +3083,7 @@ function toggleBrokerPanel() {
             showRoomLoadingOverlay();
             out.textContent = '↩️ 正在回退到最近一次生成底图...';
             try {
-                const res = await fetch('assets/restore-last-generated-background', { method: 'POST' });
+                const res = await fetch('/assets/restore-last-generated-background', { method: 'POST' });
                 const data = await res.json();
                 if (!data.ok) {
                     out.textContent = `❌ 回退失败：${data.msg || res.status}`;
@@ -3142,7 +3122,7 @@ function toggleBrokerPanel() {
                 // 使用缓存，避免频繁请求
             } else {
                 try {
-                    const data = await fetchJsonSafe('assets/home-favorites/list', { cache: 'no-store' });
+                    const data = await fetchJsonSafe('/assets/home-favorites/list', { cache: 'no-store' });
                     if (data && data.ok && Array.isArray(data.items)) {
                         homeFavoritesCache = data.items;
                         homeFavoritesLoadedAt = now;
@@ -3176,7 +3156,7 @@ function toggleBrokerPanel() {
             flashButtonActive(btn);
             const out = document.getElementById('asset-move-result') || document.getElementById('asset-upload-result');
             try {
-                const data = await fetchJsonSafe('assets/home-favorites/save-current', { method: 'POST' });
+                const data = await fetchJsonSafe('/assets/home-favorites/save-current', { method: 'POST' });
                 if (!data.ok) {
                     out.textContent = `❌ 收藏失败：${data.msg || 'unknown error'}`;
                     return;
@@ -3194,7 +3174,7 @@ function toggleBrokerPanel() {
             showRoomLoadingOverlay();
             setWorkingStatus('正在替换收藏地图');
             try {
-                const data = await fetchJsonSafe('assets/home-favorites/apply', {
+                const data = await fetchJsonSafe('/assets/home-favorites/apply', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id })
@@ -3218,7 +3198,7 @@ function toggleBrokerPanel() {
             if (!id) return;
             if (!window.confirm('确定删除这个收藏吗？删除后不可恢复。')) return;
             try {
-                const data = await fetchJsonSafe('assets/home-favorites/delete', {
+                const data = await fetchJsonSafe('/assets/home-favorites/delete', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id })
@@ -3243,7 +3223,7 @@ function toggleBrokerPanel() {
             }
             if (!window.confirm(`⚠️ 确定将 ${path} 重置为默认资产吗？`)) return;
             try {
-                const res = await fetch('assets/restore-default', {
+                const res = await fetch('/assets/restore-default', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ path })
@@ -3269,7 +3249,7 @@ function toggleBrokerPanel() {
             }
             if (!window.confirm(`⚠️ 确定将 ${path} 回退到上一版吗？`)) return;
             try {
-                const res = await fetch('assets/restore-prev', {
+                const res = await fetch('/assets/restore-prev', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ path })
@@ -3350,7 +3330,7 @@ function toggleBrokerPanel() {
         }
 
         function leaveGuestAgent(agentId, name) {
-            fetch('leave-agent', {
+            fetch('/leave-agent', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ agentId, name })
@@ -3385,7 +3365,7 @@ function toggleBrokerPanel() {
         }
 
         function approveGuestAgent(agentId) {
-            fetch('agent-approve', {
+            fetch('/agent-approve', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ agentId })
@@ -3402,7 +3382,7 @@ function toggleBrokerPanel() {
         }
 
         function rejectGuestAgent(agentId) {
-            fetch('agent-reject', {
+            fetch('/agent-reject', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ agentId })
@@ -3443,7 +3423,7 @@ function toggleBrokerPanel() {
 
             const visitors = getMergedVisitors();
             if (visitors.length === 0) {
-                list.innerHTML = '<div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px 0;">' + t('noGuest') + '</div>';
+                list.innerHTML = '<div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px 0;">暂无访客</div>';
                 return;
             }
 
@@ -3451,31 +3431,26 @@ function toggleBrokerPanel() {
                 const name = agent.name || '未命名访客';
                 const authStatus = agent.authStatus || 'pending';
                 const state = agent.state || 'idle';
-                const statusMaps = {
-                    zh: { approved:'已授权', pending:'待授权', rejected:'已拒绝', offline:'离线' },
-                    en: { approved:'Approved', pending:'Pending', rejected:'Rejected', offline:'Offline' },
-                    ja: { approved:'承認済', pending:'承認待ち', rejected:'拒否', offline:'オフライン' }
+                const statusMap = {
+                    approved: '已授权',
+                    pending: '待授权',
+                    rejected: '已拒绝',
+                    offline: '离线'
                 };
-                const stateMaps = {
-                    zh: { idle:'待命', writing:'工作', researching:'调研', executing:'执行', syncing:'同步', error:'报警' },
-                    en: { idle:'Idle', writing:'Working', researching:'Researching', executing:'Executing', syncing:'Syncing', error:'Error' },
-                    ja: { idle:'待機', writing:'作業中', researching:'調査中', executing:'実行中', syncing:'同期中', error:'警報' }
+                const stateMap = {
+                    idle: '待命',
+                    writing: '工作',
+                    researching: '调研',
+                    executing: '执行',
+                    syncing: '同步',
+                    error: '报警'
                 };
-                const btnTexts = {
-                    zh: { desk:'查看桌面', skill:'交换skill', leave:'离开房间' },
-                    en: { desk:'View Desk', skill:'Swap Skill', leave:'Leave Room' },
-                    ja: { desk:'デスクを見る', skill:'スキル交換', leave:'退室' }
-                };
-                const lang = uiLang || 'zh';
-                const statusMap = statusMaps[lang] || statusMaps.zh;
-                const stateMap = stateMaps[lang] || stateMaps.zh;
-                const btnT = btnTexts[lang] || btnTexts.zh;
 
                 const statusText = statusMap[authStatus] || authStatus;
                 const stateText = stateMap[state] || state;
                 const subtitle = `${statusText} · ${stateText}`;
 
-                const pendingActions = `<button onclick="openDeskView('${agent.agentId}','${name.replace(/'/g,"\\'")}','${state}','${agent.detail||''}')">${btnT.desk}</button><button onclick="alert('${lang==='en'?'Skill swap coming soon':lang==='ja'?'スキル交換機能開発中':'交换 skill 功能开发中'}')">${btnT.skill}</button><button class="leave-btn" onclick="leaveGuestAgent('${agent.agentId}','${name}')">${btnT.leave}</button>`;
+                const pendingActions = `<button onclick="alert('交换 skill 功能开发中')">交换skill</button><button class="leave-btn" onclick="leaveGuestAgent('${agent.agentId}','${name}')">离开房间</button>`;
 
                 return `
                   <div class="guest-agent-item" data-name="${name}">
@@ -3551,8 +3526,6 @@ function toggleBrokerPanel() {
         }
 
         function renderGuestAgentsInScene() {
-            // 禁用旧 guest 渲染，由 DESK_AGENTS 固定工位替代
-            return;
             if (!game) return;
             const visitors = getMergedVisitors();
             const seenIds = new Set();
@@ -3575,7 +3548,7 @@ function toggleBrokerPanel() {
                     let sprite;
                     const isDemoNika = DEMO_MODE && (agent.agentId === 'demo_nika' || agent.name === '尼卡');
                     const isDemoMercury = DEMO_MODE && (agent.agentId === 'demo_mercury' || agent.name === '水星');
-
+                    
                     if (isDemoNika || isDemoMercury) {
                         // 统一使用动态像素角色，避免依赖已删除的 demo 静态图
                         const animKey = 'guest_anim_1';
@@ -3706,7 +3679,7 @@ function toggleBrokerPanel() {
             const id = ids[Math.floor(Math.random() * ids.length)];
             const g = guestSprites[id];
 
-            // demo 气泡：优先展示与状态对应的内容，便于验证"状态→区域→气泡"链路
+            // demo 气泡：优先展示与状态对应的内容，便于验证“状态→区域→气泡”链路
             const demoVisitor = (DEMO_MODE && window.__demoVisitors)
                 ? (window.__demoVisitors.find(v => v.agentId === id) || window.__demoVisitors.find(v => v.name === (g.nameText && g.nameText.text)))
                 : null;
@@ -3729,7 +3702,7 @@ function toggleBrokerPanel() {
             }
 
             const bx = g.sprite.x;
-            // 气泡位置：demo 维持原逻辑；真实访客放在"名字上方"，避免压角色也避免压名字
+            // 气泡位置：demo 维持原逻辑；真实访客放在“名字上方”，避免压角色也避免压名字
             const isDemoGuest = (demoVisitor && demoVisitor.isDemo) || (id === 'demo_nika' || id === 'demo_mercury');
             const nameH = (g.nameText && g.nameText.height) ? g.nameText.height : 16;
             const by = isDemoGuest ? (g.sprite.y - 90) : ((g.nameText ? g.nameText.y : (g.sprite.y - 150)) - (nameH / 2) - 22);
@@ -3866,17 +3839,11 @@ function toggleBrokerPanel() {
             // demo 随机状态先更新（不依赖后端）
             maybeRandomizeDemoVisitors();
 
-            return fetch('agents?t=' + Date.now(), { cache: 'no-store' })
-                .then(response => {
-                    if (!response.ok) throw new Error('HTTP ' + response.status);
-                    return response.json();
-                })
+            return fetch('/agents?t=' + Date.now(), { cache: 'no-store' })
+                .then(response => response.json())
                 .then(data => {
                     // 无论后端返回是否为数组，demo=1 都应保证本地 demo 访客可见
-                    if (Array.isArray(data) && data.length > 0) {
-                        guestAgents = data;
-                    }
-                    // If backend returns empty or non-array, keep existing guestAgents
+                    guestAgents = Array.isArray(data) ? data : [];
 
                     // 新访客检测：触发 Star 欢迎气泡（只欢迎真实访客，不欢迎 demo）
                     try {
@@ -3902,7 +3869,7 @@ function toggleBrokerPanel() {
                                     const lang = uiLang;
                                     const welcomeTexts = {
                                         zh: [`欢迎 ${newAgent.name} 来到办公室～`,`Hi ${newAgent.name}，一起开工吧`,`${newAgent.name} 已加入，欢迎！`],
-                                        en: [`Welcome ${newAgent.name} to the office!`,`Hi ${newAgent.name}, let\u0027s build something.`,`${newAgent.name} just joined - welcome!`],
+                                        en: [`Welcome ${newAgent.name} to the office!`,`Hi ${newAgent.name}, let’s build something.`,`${newAgent.name} just joined — welcome!`],
                                         ja: [`${newAgent.name} さん、オフィスへようこそ！`,`Hi ${newAgent.name}、一緒に進めよう。`,`${newAgent.name} さんが参加しました、歓迎！`]
                                     };
                                     const langPack = BUBBLE_TEXTS[lang] || BUBBLE_TEXTS.zh;
@@ -3920,61 +3887,14 @@ function toggleBrokerPanel() {
                     } catch (e) { /* ignore */ }
 
                     renderGuestAgentList();
-                    // renderGuestAgentsInScene(); // disabled
-
-                    // 彻底清除旧 guest sprite（Max 修复：防止残留红色小人）
-                    Object.keys(guestSprites).forEach(id => {
-                        if (guestSprites[id].sprite) guestSprites[id].sprite.destroy();
-                        if (guestSprites[id].nameText) guestSprites[id].nameText.destroy();
-                        delete guestSprites[id];
-                    });
-
-                    // 更新固定工位 sprite 动画+状态
-                    if (window._deskAgentSprites && Array.isArray(guestAgents)) {
-                        const stateLabels = {idle:'待命',writing:'工作中',researching:'调研中',executing:'执行中',syncing:'同步中',error:'异常',offline:'离线'};
-                        const stateColors = {idle:'#94a3b8',writing:'#22cc55',researching:'#38bdf8',executing:'#f59e0b',syncing:'#a78bfa',error:'#ef4444',offline:'#64748b'};
-                        for (const agent of guestAgents) {
-                            const da = window._deskAgentSprites[agent.agentId];
-                            if (!da) continue;
-                            const state = agent.state || 'idle';
-                            const authStatus = agent.authStatus || 'pending';
-                            // 动画
-                            if (state === 'writing' || state === 'executing' || state === 'researching') {
-                                // da.sprite.anims.play('guest_work_' + da.role, true); // disabled - static frame
-                            } else {
-                                // da.sprite.anims.play('guest_idle_' + da.role, true); // disabled - static frame
-                            }
-                            // 离线半透明
-                            const isOff = authStatus === 'offline';
-                            da.sprite.setAlpha(isOff ? 0.4 : 1);
-                            da.nameLabel.setAlpha(isOff ? 0.4 : 1);
-                            // 状态文字
-                            da.stateLabel.setText(stateLabels[isOff ? 'offline' : state] || state);
-                            da.stateLabel.setColor(stateColors[isOff ? 'offline' : state] || '#94a3b8');
-                        }
-                    }
-
-                    // Max 暴力清理：销毁所有非 DESK_AGENTS 的 guest sprite
-                    if (game && game.children) {
-                        const deskSet = new Set();
-                        if (window._deskAgentSprites) {
-                            Object.values(window._deskAgentSprites).forEach(d => { if (d.sprite) deskSet.add(d.sprite); });
-                        }
-                        game.children.list.slice().forEach(child => {
-                            if (child.texture && child.texture.key &&
-                                (child.texture.key.startsWith('guest_role_') || child.texture.key.startsWith('guest_anim_')) &&
-                                !deskSet.has(child)) {
-                                child.destroy();
-                            }
-                        });
-                    }
+                    renderGuestAgentsInScene();
                 })
                 .catch(error => {
                     console.error('拉取访客列表失败:', error);
                     // 即使拉取失败，demo 也要能渲染
                     if (DEMO_MODE) {
                         renderGuestAgentList();
-                        // renderGuestAgentsInScene(); // disabled
+                        renderGuestAgentsInScene();
                     }
                 });
         }
@@ -4005,7 +3925,7 @@ function toggleBrokerPanel() {
             setTimeout(async () => {
                 // 动态探测 flowers 精灵表帧规格（避免写死 65x65 导致显示比例异常）
                 try {
-                    const res = await fetch('assets/list?t=' + Date.now(), { cache: 'no-store' });
+                    const res = await fetch('/assets/list?t=' + Date.now(), { cache: 'no-store' });
                     const data = await res.json();
                     if (data && data.ok && Array.isArray(data.items)) {
                         const flowerItem = data.items.find(it => (it.path || '').toLowerCase().includes('flowers-bloom-v2'));
@@ -4024,7 +3944,7 @@ function toggleBrokerPanel() {
                 // Only fetch /assets/positions and /assets/defaults when user is authed,
                 // to avoid 401 Unauthorized on first load for new visitors (issue #54).
                 try {
-                    const authRes = await fetch('assets/auth/status', { cache: 'no-store' });
+                    const authRes = await fetch('/assets/auth/status', { cache: 'no-store' });
                     const authData = await authRes.json();
                     if (authData && authData.ok && authData.authed) {
                         await applySavedPositionOverrides();
@@ -4039,92 +3959,81 @@ function toggleBrokerPanel() {
             loadingProgressBar = document.getElementById('loading-progress-bar');
             loadingText = document.getElementById('loading-text');
             loadingProgressContainer = document.getElementById('loading-progress-container');
-
+            
             // 设置资源总数（全部首屏加载：装饰也第一时间出现）
             totalAssets = 15;
             loadedAssets = 0;
-
+            
             // 加载进度监听
             this.load.on('filecomplete', () => {
                 updateLoadingProgress();
             });
-
+            
             this.load.on('complete', () => {
                 hideLoadingOverlay();
             });
 
             // cache-busting to avoid stale background on client/CDN
             // use smaller/new map version provided by user
-            this.load.image('office_bg', 'static/office_bg_small.webp?v={{VERSION_TIMESTAMP}}');
-            this.load.spritesheet('star_idle', 'static/star-idle-v5.png?v={{VERSION_TIMESTAMP}}', { frameWidth: 256, frameHeight: 256 });
+            this.load.image('office_bg', '/static/office_bg_small.webp?v={{VERSION_TIMESTAMP}}');
+            this.load.spritesheet('star_idle', '/static/star-idle-v5.png?v={{VERSION_TIMESTAMP}}', { frameWidth: 256, frameHeight: 256 });
 
             // Furniture
-            this.load.image('sofa_idle', 'static/sofa-idle-v3.png?v={{VERSION_TIMESTAMP}}');
-            this.load.image('sofa_shadow', 'static/sofa-shadow-v1.png?v={{VERSION_TIMESTAMP}}');
+            this.load.image('sofa_idle', '/static/sofa-idle-v3.png?v={{VERSION_TIMESTAMP}}');
+            this.load.image('sofa_shadow', '/static/sofa-shadow-v1.png?v={{VERSION_TIMESTAMP}}');
 
             // Decor
-            this.load.spritesheet('plants', 'static/plants-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 160, frameHeight: 160 });
-            this.load.spritesheet('posters', 'static/posters-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 160, frameHeight: 160 });
-            this.load.spritesheet('coffee_machine', 'static/coffee-machine-v3-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 230, frameHeight: 230 });
-            this.load.image('coffee_machine_shadow', 'static/coffee-machine-shadow-v1.png?v={{VERSION_TIMESTAMP}}');
-            this.load.spritesheet('serverroom', 'static/serverroom-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 180, frameHeight: 251 });
+            this.load.spritesheet('plants', '/static/plants-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 160, frameHeight: 160 });
+            this.load.spritesheet('posters', '/static/posters-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 160, frameHeight: 160 });
+            this.load.spritesheet('coffee_machine', '/static/coffee-machine-v3-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 230, frameHeight: 230 });
+            this.load.image('coffee_machine_shadow', '/static/coffee-machine-shadow-v1.png?v={{VERSION_TIMESTAMP}}');
+            this.load.spritesheet('serverroom', '/static/serverroom-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 180, frameHeight: 251 });
 
             // Error / bug animation: 180x180, 96 frames (repacked grid)
-            this.load.spritesheet('error_bug', 'static/error-bug-spritesheet-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 220, frameHeight: 220 });
+            this.load.spritesheet('error_bug', '/static/error-bug-spritesheet-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 220, frameHeight: 220 });
 
             // 运行时 Gemini 配置（用于搬家/中介生图）
             this.geminiConfig = { hasKey: false, model: 'gemini-3.1-flash-image-preview' };
 
             // Cat spritesheet: 160x160, 4x4=16 cats
-            this.load.spritesheet('cats', 'static/cats-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 160, frameHeight: 160 });
+            this.load.spritesheet('cats', '/static/cats-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 160, frameHeight: 160 });
 
             // Desk
             // Star working animation: repacked to grid to avoid WebGL max texture size limits
             // NOTE: prefer WebP for size, PNG fallback
             // 动态替换后按最新素材识别：当前 writing 素材为 300x300 单帧
-            this.load.spritesheet('star_working', 'static/star-working-spritesheet-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 300, frameHeight: 300 });
+            this.load.spritesheet('star_working', '/static/star-working-spritesheet-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 300, frameHeight: 300 });
 
             // Sync state animation (256x256, 多帧): 非同步显示首帧，同步从第2帧循环
-            this.load.spritesheet('sync_anim', 'static/sync-animation-v3-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 256, frameHeight: 256 });
+            this.load.spritesheet('sync_anim', '/static/sync-animation-v3-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 256, frameHeight: 256 });
 
             // Memo background image
-            // memo 底图固定走 png，避免某些端 webp 透明通道异常导致"底图丢失"
-            this.load.image('memo_bg', 'static/memo-bg.webp?v={{VERSION_TIMESTAMP}}');
+            // memo 底图固定走 png，避免某些端 webp 透明通道异常导致“底图丢失”
+            this.load.image('memo_bg', '/static/memo-bg.webp?v={{VERSION_TIMESTAMP}}');
             // Desk v2 (webp only)
-            this.load.image('desk_v2', 'static/desk-v3.webp?v={{VERSION_TIMESTAMP}}');
+            this.load.image('desk_v2', '/static/desk-v3.webp?v={{VERSION_TIMESTAMP}}');
             // Flower spritesheet (65x65, 16 frames)
-            this.load.spritesheet('flowers', 'static/flowers-bloom-v2.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: FLOWERS_FRAME_W, frameHeight: FLOWERS_FRAME_H });
+            this.load.spritesheet('flowers', '/static/flowers-bloom-v2.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: FLOWERS_FRAME_W, frameHeight: FLOWERS_FRAME_H });
 
             // Guest/Demo agent sprites
-            this.load.spritesheet('guest_anim_1', 'static/guest_anim_1.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-            this.load.spritesheet('guest_anim_2', 'static/guest_anim_2.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-            this.load.spritesheet('guest_anim_3', 'static/guest_anim_3.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-            this.load.spritesheet('guest_anim_4', 'static/guest_anim_4.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-            this.load.spritesheet('guest_anim_5', 'static/guest_anim_5.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-            this.load.spritesheet('guest_anim_6', 'static/guest_anim_6.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-
-            // Guest role sprites (idle poses, 64x64 per frame, 2 frames)
-            for (let i = 1; i <= 6; i++) {
-                this.load.spritesheet('guest_role_' + i, 'static/guest_role_' + i + '.png?v={{VERSION_TIMESTAMP}}', { frameWidth: 64, frameHeight: 64 });
-            }
-
-            // 原版角色 atlas（adam/ash/lucy/nancy — 含 idle/run/sit 动画）
-            const charNames = ['adam', 'ash', 'lucy', 'nancy'];
-            charNames.forEach(name => {
-                this.load.atlas('char_' + name, 'static/char_' + name + '.png?v={{VERSION_TIMESTAMP}}', 'static/char_' + name + '.json?v={{VERSION_TIMESTAMP}}');
-            });
+            this.load.spritesheet('guest_anim_1', '/static/guest_anim_1.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
+            this.load.spritesheet('guest_anim_2', '/static/guest_anim_2.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
+            this.load.spritesheet('guest_anim_3', '/static/guest_anim_3.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
+            this.load.spritesheet('guest_anim_4', '/static/guest_anim_4.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
+            this.load.spritesheet('guest_anim_5', '/static/guest_anim_5.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
+            this.load.spritesheet('guest_anim_6', '/static/guest_anim_6.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
         }
 
         function create() {
             game = this;
             hideGameSkeleton();
-            officeBgSprite = this.add.image(640, 480, 'office_bg');
+            officeBgSprite = this.add.image(640, 360, 'office_bg');
 
             // Place furniture: Sofa
             // NOTE: coordinates are interpreted as the TOP-LEFT corner of the sprite
-            const sofaShadow = this.add.image(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y, 'sofa_shadow').setOrigin(0.5).setScale(2).setVisible(false);
+            const sofaShadow = this.add.image(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y, 'sofa_shadow').setOrigin(0.5);
             sofaShadow.setDepth(9);
-            sofa = this.add.sprite(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y, 'sofa_idle').setOrigin(0.5).setScale(2).setVisible(false);
+            sofa = this.add.sprite(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y, 'sofa_idle').setOrigin(0.5);
             sofa.setDepth(10);
             areas = {
                 door: { x: 640, y: 550 }, // 墙的门（偏下 1/3 位置）
@@ -4159,12 +4068,11 @@ function toggleBrokerPanel() {
 
             star = game.physics.add.sprite(areas.breakroom.x, areas.breakroom.y, 'star_idle');
             star.setOrigin(0.5);
-            star.setScale(IDLE_STAR_SCALE * 2);
-            star.setAlpha(0);
-            star.setDepth(-1);
-            // 隐藏原版 Star 主角，由 DESK_AGENTS 固定工位替代
-            star.setVisible(false);
-            star.setActive(false);
+            star.setScale(IDLE_STAR_SCALE);
+            star.setAlpha(0.95);
+            star.setDepth(20); // Put Star on top of everything
+            // Default: idle shows Star idle animation
+            star.setVisible(true);
             star.anims.play('star_idle', true);
 
             // Sofa stays static when idle (no longer the main idle animation)
@@ -4178,14 +4086,12 @@ function toggleBrokerPanel() {
             plaqueBg.setStrokeStyle(3, 0x3e2723);
             const plaqueText = game.add.text(plaqueX, plaqueY, t('officeTitle'), {
                 fontFamily: 'ArkPixel, monospace',
-                fontSize: '24px',
+                fontSize: '18px',
                 fill: '#ffd700',
                 fontWeight: '900',
                 fontStyle: 'bold',
                 stroke: '#000',
-                strokeThickness: 3,
-                wordWrap: { width: 400 },
-                align: 'center'
+                strokeThickness: 3
             }).setOrigin(0.5);
             // 牌匾两边加个小装饰（跟随牌匾居中）
             game.add.text(plaqueX - 190, plaqueY, '⭐', { fontFamily: 'ArkPixel, monospace', fontSize: '20px' }).setOrigin(0.5);
@@ -4195,13 +4101,13 @@ function toggleBrokerPanel() {
             // Random plant at (565,178) (frame 0-15, 160x160 each)
             const plantFrameCount = 16;
             const randomPlantFrame = Math.floor(Math.random() * plantFrameCount);
-            const plant = game.add.sprite(1130, 356, 'plants', randomPlantFrame).setOrigin(0.5).setScale(2).setVisible(false);
+            const plant = game.add.sprite(565, 178, 'plants', randomPlantFrame).setOrigin(0.5);
             plant.setDepth(5);
             plant.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
             window.plantSprite = plant;
             window.plantFrameCount = plantFrameCount;
-
+            
             plant.on('pointerdown', () => {
                 const next = Math.floor(Math.random() * window.plantFrameCount);
                 window.plantSprite.setFrame(next);
@@ -4209,12 +4115,12 @@ function toggleBrokerPanel() {
 
             // Random plant at (230,185) (frame 0-15, 160x160 each)
             const plant2Frame = Math.floor(Math.random() * plantFrameCount);
-            const plant2 = game.add.sprite(460, 370, 'plants', plant2Frame).setOrigin(0.5).setScale(2).setVisible(false);
+            const plant2 = game.add.sprite(230, 185, 'plants', plant2Frame).setOrigin(0.5);
             plant2.setDepth(5);
             plant2.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
             window.plantSprite2 = plant2;
-
+            
             plant2.on('pointerdown', () => {
                 const next = Math.floor(Math.random() * window.plantFrameCount);
                 window.plantSprite2.setFrame(next);
@@ -4222,12 +4128,12 @@ function toggleBrokerPanel() {
 
             // Random plant at (977,496) (frame 0-15, 160x160 each)
             const plant3Frame = Math.floor(Math.random() * plantFrameCount);
-            const plant3 = game.add.sprite(1954, 992, 'plants', plant3Frame).setOrigin(0.5).setScale(2).setVisible(false);
+            const plant3 = game.add.sprite(977, 496, 'plants', plant3Frame).setOrigin(0.5);
             plant3.setDepth(5);
             plant3.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
             window.plantSprite3 = plant3;
-
+            
             plant3.on('pointerdown', () => {
                 const next = Math.floor(Math.random() * window.plantFrameCount);
                 window.plantSprite3.setFrame(next);
@@ -4236,13 +4142,13 @@ function toggleBrokerPanel() {
             // Random poster at (252,66) (random frame from spritesheet)
             const postersFrameCount = (this.textures.get('posters')?.frameTotal || 1) - 1;
             const randomPosterFrame = Math.floor(Math.random() * Math.max(1, postersFrameCount));
-            const poster = game.add.sprite(504, 132, 'posters', randomPosterFrame).setOrigin(0.5).setScale(2).setVisible(false);
+            const poster = game.add.sprite(252, 66, 'posters', randomPosterFrame).setOrigin(0.5);
             poster.setDepth(4);
             poster.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
             window.posterSprite = poster;
             window.posterFrameCount = postersFrameCount;
-
+            
             poster.on('pointerdown', () => {
                 const next = Math.floor(Math.random() * window.posterFrameCount);
                 window.posterSprite.setFrame(next);
@@ -4251,7 +4157,7 @@ function toggleBrokerPanel() {
             // Random cat at (94,557)
             const catsFrameCount = (this.textures.get('cats')?.frameTotal || 1) - 1;
             const randomCatFrame = Math.floor(Math.random() * Math.max(1, catsFrameCount));
-            const cat = game.add.sprite(188, 1114, 'cats', randomCatFrame).setOrigin(0.5).setScale(2).setVisible(false);
+            const cat = game.add.sprite(94, 557, 'cats', randomCatFrame).setOrigin(0.5);
             cat.setDepth(2000); // top layer
             cat.setInteractive({ useHandCursor: true });
             // Expose to global for click handler
@@ -4263,7 +4169,7 @@ function toggleBrokerPanel() {
             });
 
             // Coffee machine at (659,397) - animated sprite + shadow
-            const coffeeMachineShadow = this.add.image(1318, 794, 'coffee_machine_shadow').setOrigin(0.5).setScale(2).setVisible(false);
+            const coffeeMachineShadow = this.add.image(659, 397, 'coffee_machine_shadow').setOrigin(0.5);
             coffeeMachineShadow.setDepth(98);
             const coffeeFrameMax = Math.max(0, (this.textures.get('coffee_machine')?.frameTotal || 1) - 2);
             if (this.anims.exists('coffee_machine')) {
@@ -4275,7 +4181,7 @@ function toggleBrokerPanel() {
                 frameRate: 12.5,
                 repeat: -1
             });
-            const coffeeMachine = this.add.sprite(1318, 794, 'coffee_machine').setOrigin(0.5).setScale(2).setVisible(false);
+            const coffeeMachine = this.add.sprite(659, 397, 'coffee_machine').setOrigin(0.5);
             coffeeMachine.setDepth(99);
             coffeeMachine.anims.play('coffee_machine', true);
 
@@ -4287,20 +4193,20 @@ function toggleBrokerPanel() {
                 frameRate: 6,
                 repeat: -1
             });
-            serverroom = this.add.sprite(2042, 284, 'serverroom', 0).setOrigin(0.5).setScale(2).setVisible(false);
+            serverroom = this.add.sprite(1021, 142, 'serverroom', 0).setOrigin(0.5);
             serverroom.setDepth(2);
             // 默认 idle: 静止第0帧
             serverroom.anims.stop();
             serverroom.setFrame(0);
 
             // Desk at (218,417) (v2)
-            const desk = this.add.image(436, 834, 'desk_v2').setScale(2).setOrigin(0.5).setVisible(false);
+            const desk = this.add.image(218, 417, 'desk_v2').setOrigin(0.5);
             desk.setDepth(1001);  // desk above starWorking
 
             // Random flower pot at (310,390), default scale 0.8 (top layer)
             const flowerFrameCount = Math.max(1, FLOWERS_FRAME_COLS * FLOWERS_FRAME_ROWS); // 动态帧数
             const randomFlowerFrame = Math.floor(Math.random() * flowerFrameCount);
-            const flower = this.add.sprite(620, 780, 'flowers', randomFlowerFrame).setOrigin(0.5).setScale(2).setVisible(false);
+            const flower = this.add.sprite(310, 390, 'flowers', randomFlowerFrame).setOrigin(0.5);
             flower.setScale(0.8);
             flower.setDepth(1100); // highest among desk/starWorking
             flower.setInteractive({ useHandCursor: true });
@@ -4329,14 +4235,14 @@ function toggleBrokerPanel() {
             });
 
             // Error bug character (moves between two points when state=error)
-            const errorBug = this.add.sprite(2014, 442, 'error_bug', 0).setOrigin(0.5).setScale(2).setVisible(false);
+            const errorBug = this.add.sprite(1007, 221, 'error_bug', 0).setOrigin(0.5);
             errorBug.setDepth(50); // above serverroom, below desk/bubbles
             errorBug.setVisible(false);
             errorBug.setScale(0.9); // shrink 10%
             errorBug.anims.play('error_bug', true);
             window.errorBug = errorBug;
             window.errorBugDir = 1; // 1 -> to right, -1 -> to left
-            const starWorking = this.add.sprite(434, 686, 'star_working', 0).setOrigin(0.5).setScale(2).setVisible(false);
+            const starWorking = this.add.sprite(217, 343, 'star_working', 0).setOrigin(0.5);
             starWorking.setVisible(false);
             starWorking.setScale(0.9);
             starWorking.setDepth(900);  // starWorking under desk so desk partially covers it
@@ -4360,7 +4266,7 @@ function toggleBrokerPanel() {
                 repeat: -1
             });
             }
-            syncAnimSprite = this.add.sprite(2314, 1184, 'sync_anim', 0).setOrigin(0.5).setScale(2).setVisible(false);
+            syncAnimSprite = this.add.sprite(1157, 592, 'sync_anim', 0).setOrigin(0.5);
             syncAnimSprite.setDepth(40);
             // default show first frame only
             syncAnimSprite.anims.stop();
@@ -4385,7 +4291,7 @@ function toggleBrokerPanel() {
                 coordsToggle.style.background = showCoords ? '#e94560' : '#333';
             });
 
-            // 允许手机端"拖动/滑动"来移动视野（本质：移动 Phaser Camera）
+            // 允许手机端“拖动/滑动”来移动视野（本质：移动 Phaser Camera）
             // iPhone 等触屏设备默认开启；桌面端默认关闭（可手动开）。
             const panToggle = document.getElementById('pan-toggle');
             const isTouchDevice = IS_TOUCH_DEVICE;
@@ -4394,8 +4300,8 @@ function toggleBrokerPanel() {
             let panStart = null; // {x,y,sx,sy}
             const camera = game.cameras.main;
 
-            const MAP_W = 1280;
-            const MAP_H = 960;
+            const MAP_W = config.width;
+            const MAP_H = config.height;
             function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
             function maxScrollX() {
                 const viewportW = camera.width / Math.max(0.01, camera.zoom);
@@ -4410,30 +4316,47 @@ function toggleBrokerPanel() {
                 camera.scrollY = clamp(camera.scrollY, 0, maxScrollY());
             }
 
-            // 手机上：锁定"办公室画布高度 = 2/3 区域高度"，
+            // 手机上：锁定“办公室画布高度 = 2/3 区域高度”，
             // 让世界坐标在竖向恰好看满（不需要上下拖），只保留横向拖动浏览左右。
             // 记录初始是否已手动平移（避免 resize 时把用户拖好的位置重置）
             let hasManuallyPanned = false;
             function applyMobileCameraFit() {
-                const w = Math.max(1, window.innerWidth);
-                const h = Math.max(1, window.innerHeight);
-                const zoom = Math.min(w / MAP_W, h / MAP_H) * 0.88;
-                camera.setZoom(zoom);
-                camera.centerOn(MAP_W / 2, MAP_H / 2);
+                if (!isTouchDevice) return;
+                const h = Math.max(1, camera.height);
+                const w = Math.max(1, camera.width);
+
+                // 关键：先按高度 fit，再看是否需要按宽度微调，
+                // 保证既不会让画面歪，又能左右拖到最左最右边缘不被裁。
+                const fitHeightZoom = h / MAP_H;
+                const candidateZoom = fitHeightZoom;
+
+                // 按 candidateZoom 计算：viewport 在世界坐标里的宽高
+                const viewW = w / candidateZoom;
+                const maxX = Math.max(0, MAP_W - viewW);
+
+                camera.setZoom(candidateZoom);
+                camera.scrollX = Math.min(camera.scrollX, maxX);
+                camera.scrollY = 0;
+
+                // 仅在未手动平移过时才居中（避免把用户拖好的位置冲掉）
+                if (!hasManuallyPanned) {
+                    camera.centerOn(MAP_W / 2, MAP_H / 2);
+                }
+                camera.scrollX = clamp(camera.scrollX, 0, maxX);
+                camera.scrollY = 0;
             }
             applyMobileCameraFit();
 
-            // 窗口 resize 时重算 zoom
-            if (game.scale) {
+            // 手机端旋转屏幕/地址栏伸缩时，重算 zoom + 夹紧 camera
+            if (isTouchDevice && game.scale) {
                 game.scale.on('resize', () => {
                     applyMobileCameraFit();
                     placeOverlayAndStatusAtCanvasBottomLeft();
                 });
             }
 
-            camera.setBounds(-100, -80, 1580, 1120);
-            // centerOn after bounds to shift view toward office area
-            camera.centerOn(MAP_W / 2, MAP_H / 2);
+            camera.setBounds(0, 0, MAP_W, MAP_H);
+            clampCameraScroll();
 
             function setPanEnabled(on) {
                 panEnabled = on;
@@ -4444,7 +4367,7 @@ function toggleBrokerPanel() {
                 }
                 game.input.setDefaultCursor(on ? 'grab' : 'default');
                 if (isTouchDevice && statusText) {
-                    const info = on ? '视野拖动已开启（可左右拖动画布）' : '视野拖动已关闭（点击左上角"移动视野"可开启）';
+                    const info = on ? '视野拖动已开启（可左右拖动画布）' : '视野拖动已关闭（点击左上角“移动视野”可开启）';
                     statusText.textContent = `状态：[${(STATES[currentState] && STATES[currentState].name) || '待命'}] ${info}`;
                 }
             }
@@ -4453,7 +4376,7 @@ function toggleBrokerPanel() {
                 panToggle.addEventListener('click', () => setPanEnabled(!panEnabled));
             }
 
-            // 手机端默认关闭拖动画面：由左上角"移动视野"开关显式开启
+            // 手机端默认关闭拖动画面：由左上角“移动视野”开关显式开启
             if (isTouchDevice) {
                 setPanEnabled(false);
             }
@@ -4465,7 +4388,7 @@ function toggleBrokerPanel() {
             const canvasEl = game.canvas;
             let touchPan = null; // {x,y,sx,sy,lock:'x'|'y'|null}
             if (canvasEl) {
-                // 手机端允许页面自然滚动，避免"不能滑动"
+                // 手机端允许页面自然滚动，避免“不能滑动”
                 canvasEl.style.touchAction = 'auto';
 
                 canvasEl.addEventListener('touchstart', (e) => {
@@ -4518,7 +4441,7 @@ function toggleBrokerPanel() {
                 const dx = pointer.x - panStart.x;
                 const dy = pointer.y - panStart.y;
 
-                // 手机端优先"横向拖动看办公室"，纵向手势留给页面滚动看下方面板。
+                // 手机端优先“横向拖动看办公室”，纵向手势留给页面滚动看下方面板。
                 if (isTouchDevice && Math.abs(dy) > Math.abs(dx)) {
                     return;
                 }
@@ -4552,112 +4475,6 @@ function toggleBrokerPanel() {
 
             fetchStatus();
             fetchGuestAgents();
-
-            // === 7 个 agent 固定工位（Phaser 画布内直接渲染）===
-            const DESK_AGENTS = [
-                // 全部集中在办公区 — 4+3 布局
-                // 上排 4人
-                { id: 'backend',  name: '波哥',  char: 'adam',  x: 660,  y: 550 },
-                { id: 'sky',      name: 'Sky',  char: 'adam',  x: 810,  y: 550 },
-                { id: 'cto',      name: 'Pin哥', char: 'lucy',  x: 960,  y: 550 },
-                { id: 'manager',  name: 'K哥',   char: 'ash',   x: 1110, y: 550 },
-                // 下排 3人
-                { id: 'devops',   name: 'Max',   char: 'nancy', x: 660,  y: 700 },
-                { id: 'frontend', name: 'Jr',    char: 'ash',   x: 810,  y: 700 },
-                { id: 'qa',       name: 'Yang',  char: 'lucy',  x: 960,  y: 700 },
-            ];
-
-            // 创建原版角色动画（atlas 格式）
-            const charNames = ['adam', 'ash', 'lucy', 'nancy'];
-            charNames.forEach(name => {
-                const cap = name.charAt(0).toUpperCase() + name.slice(1);
-                // sit_down 静态帧（坐姿面朝前）
-                // idle 动画（24帧）
-                if (!this.anims.exists('char_idle_' + name)) {
-                    const idleFrames = [];
-                    for (let i = 1; i <= 24; i++) {
-                        idleFrames.push({ key: 'char_' + name, frame: cap + '_idle_anim_' + i + '.png' });
-                    }
-                    this.anims.create({ key: 'char_idle_' + name, frames: idleFrames, frameRate: 8, repeat: -1 });
-                }
-                // run 动画（24帧）
-                if (!this.anims.exists('char_run_' + name)) {
-                    const runFrames = [];
-                    for (let i = 1; i <= 24; i++) {
-                        runFrames.push({ key: 'char_' + name, frame: cap + '_run_' + i + '.png' });
-                    }
-                    this.anims.create({ key: 'char_run_' + name, frames: runFrames, frameRate: 10, repeat: -1 });
-                }
-            });
-
-            window._deskAgentSprites = {};
-            DESK_AGENTS.forEach(da => {
-                // 隐藏自定义桌子 — 使用 tilemap 原版桌子
-                // const deskSprite = game.add.image(da.x, da.y + 12, 'desk_v2').setOrigin(0.5).setScale(1.5).setDepth(1500);
-
-                // agent sprite — 使用原版角色 atlas 坐姿
-                const charKey = 'char_' + da.char;
-                const cap = da.char.charAt(0).toUpperCase() + da.char.slice(1);
-                const sitFrame = cap + '_sit_down.png';
-                const agentSprite = game.add.sprite(da.x, da.y, charKey, sitFrame).setOrigin(0.5, 1).setScale(2.0).setDepth(1502);
-                agentSprite.setInteractive({ useHandCursor: true });
-
-                const agentId = da.id;
-                const agentName = da.name;
-                agentSprite.on('pointerdown', () => {
-                    if (typeof openDeskView === 'function') {
-                        openDeskView(agentId, agentName, 'idle', '');
-                    }
-                });
-
-                // 名字标签
-                const nameLabel = game.add.text(da.x, da.y - 50, da.name, {
-                    fontFamily: 'ArkPixel, monospace',
-                    fontSize: '18px',
-                    fontStyle: 'bold',
-                    fill: '#ffffff',
-                    stroke: '#000000',
-                    strokeThickness: 6,
-                    backgroundColor: 'rgba(0,0,0,0.85)',
-                    padding: { x: 14, y: 7 }
-                }).setOrigin(0.5).setDepth(1510);
-
-                // 状态标签
-                const stateLabel = game.add.text(da.x, da.y + 18, '工作中', {
-                    fontFamily: 'ArkPixel, monospace',
-                    fontSize: '13px',
-                    fill: '#22cc55',
-                    stroke: '#000000',
-                    strokeThickness: 4,
-                }).setOrigin(0.5).setDepth(1510);
-
-                window._deskAgentSprites[da.id] = { sprite: agentSprite, nameLabel: nameLabel, stateLabel: stateLabel, char: da.char };
-            });
-
-            // 旧 sprite 清理已通过 setVisible(false) 处理
-
-            // Max 修复：定期清除旧 guest sprite 残留（depth 2600 区域）
-            // DESK_AGENTS 用 depth 1500-1510，旧 guest 用 2600-2601
-            const _deskKeepSet = new Set();
-            if (window._deskAgentSprites) {
-                Object.values(window._deskAgentSprites).forEach(da => {
-                    if (da.sprite) _deskKeepSet.add(da.sprite);
-                    if (da.nameLabel) _deskKeepSet.add(da.nameLabel);
-                    if (da.stateLabel) _deskKeepSet.add(da.stateLabel);
-                });
-            }
-            this.time.addEvent({
-                delay: 2000,
-                loop: true,
-                callback: () => {
-                    if (!game || !game.children) return;
-                    game.children.list.forEach(child => {
-                        if (child.depth >= 2500 && !_deskKeepSet.has(child)) {
-                            child.destroy();
-                        }
-                    });
-                }
-            });
         }
 
         function update(time) {
@@ -4679,12 +4496,14 @@ function toggleBrokerPanel() {
                 }
             }
 
+            // error 状态：显示 bug 动画，并在两点之间来回移动
             if (window.errorBug) {
                 if (effectiveStateForServer === 'error') {
-                    window.errorBug.setVisible(false);
+                    window.errorBug.setVisible(true);
                     if (!window.errorBug.anims.isPlaying || window.errorBug.anims.currentAnim?.key !== 'error_bug') {
                         window.errorBug.anims.play('error_bug', true);
                     }
+                    // 固定在原地（按需求取消 error 移动路径）
                     window.errorBug.x = 1007;
                     window.errorBug.y = 221;
                 } else {
@@ -4693,13 +4512,14 @@ function toggleBrokerPanel() {
                 }
             }
 
+            // Sync animation fallback logic
             if (syncAnimSprite) {
                 if (effectiveStateForServer === 'syncing') {
                     if (syncAnimPlayable && syncAnimSprite.anims && syncAnimSprite.anims.play && syncAnimSprite.scene?.anims?.exists('sync_anim')) {
-                        if (!syncAnimSprite.anims.isPlaying || syncAnimSprite.anims.currentAnim?.key !== 'sync_anim') {
-                            syncAnimSprite.anims.play('sync_anim', true);
-                        }
-                    } else {
+                    if (!syncAnimSprite.anims.isPlaying || syncAnimSprite.anims.currentAnim?.key !== 'sync_anim') {
+                        syncAnimSprite.anims.play('sync_anim', true);
+                    }
+                } else {
                         syncAnimSprite.setFrame(0);
                     }
                 } else {
@@ -4713,7 +4533,7 @@ function toggleBrokerPanel() {
                 showBubble();
                 lastBubble = time;
             }
-            // 猫的气泡
+            // 猫的气泡（频率低）
             if (time - lastCatBubble > CAT_BUBBLE_INTERVAL) {
                 showCatBubble();
                 lastCatBubble = time;
@@ -4729,21 +4549,6 @@ function toggleBrokerPanel() {
 
             // 移动 + 小踱步
             moveStar(time);
-
-            // Max 核弹清理：每帧强制隐藏 Star + 销毁非 DESK_AGENTS 的 guest sprite
-            if (star) { star.setVisible(false); star.setAlpha(0); }
-            if (window.starWorking) { window.starWorking.setVisible(false); window.starWorking.setAlpha(0); }
-            if (game && game.children && window._deskAgentSprites) {
-                const _ds = new Set();
-                Object.values(window._deskAgentSprites).forEach(d => { if (d.sprite) _ds.add(d.sprite); });
-                game.children.list.slice().forEach(child => {
-                    if (child.texture && child.texture.key &&
-                        (child.texture.key.startsWith('guest_role_') || child.texture.key.startsWith('guest_anim_') || child.texture.key === 'star_idle' || child.texture.key === 'star_working') &&
-                        !_ds.has(child) && child !== star && child !== window.starWorking) {
-                        child.destroy();
-                    }
-                });
-            }
 
             // guest 随机想法泡泡
             maybeShowGuestBubble(time);
@@ -4780,23 +4585,51 @@ function toggleBrokerPanel() {
         }
 
         function applyVisualState(nextState) {
-            // 禁用原版 Star 角色动画，由 DESK_AGENTS 替代
-            if (star) star.setVisible(false);
-            if (window.starWorking) { window.starWorking.setVisible(false); window.starWorking.anims.stop(); }
-
-            // 保留 server room 和 sync 动画
+            // Idle: show Star idle animation (main character)
             if (nextState === 'idle') {
                 sofa.anims.stop();
                 sofa.setTexture('sofa_idle');
+
+                if (window.starWorking) {
+                    window.starWorking.setVisible(false);
+                    window.starWorking.anims.stop();
+                }
+
+                star.setVisible(true);
+                star.setScale(IDLE_STAR_SCALE);
+                star.anims.play('star_idle', true);
+                star.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
             } else if (nextState === 'error') {
+                // Error: no working animation at desk
                 sofa.anims.stop();
                 sofa.setTexture('sofa_idle');
+                star.setVisible(false);
+                star.anims.stop();
+                if (window.starWorking) {
+                    window.starWorking.setVisible(false);
+                    window.starWorking.anims.stop();
+                }
             } else if (nextState === 'syncing') {
+                // Syncing: also no working animation at desk
                 sofa.anims.stop();
                 sofa.setTexture('sofa_idle');
+                star.setVisible(false);
+                star.anims.stop();
+                if (window.starWorking) {
+                    window.starWorking.setVisible(false);
+                    window.starWorking.anims.stop();
+                }
             } else {
+                // Non-idle non-error: starWorking animation at desk
                 sofa.anims.stop();
                 sofa.setTexture('sofa_idle');
+                // Hide moving star, show desk star
+                star.setVisible(false);
+                star.anims.stop();
+                if (window.starWorking) {
+                    window.starWorking.setVisible(true);
+                    window.starWorking.anims.play('star_working', true);
+                }
             }
 
             // Server room logic
@@ -4827,19 +4660,14 @@ function toggleBrokerPanel() {
         }
 
         function fetchStatus() {
-            return fetch('status', { cache: 'no-store' })
+            return fetch('/status', { cache: 'no-store' })
                 .then(response => response.json())
                 .then(data => {
                     try {
-                        if (data.officeName) {
-                            window.officeNameFromServer = data.officeName;
-                            if (window.officePlaqueText && window.officePlaqueText.setText) {
-                                window.officePlaqueText.setText(data.officeName);
-                            }
-                        }
+
                         const nextState = normalizeState(data.state);
                         const stateInfo = STATES[nextState] || STATES.idle;
-                        // If we\u0027re mid-transition, don\u0027t restart the path every poll
+                        // If we're mid-transition, don't restart the path every poll
                         const changed = (pendingDesiredState === null) && (nextState !== currentState);
                         const nextLine = '[' + stateInfo.name + '] ' + (data.detail || '...');
                         // 不论 changed 与否，都按服务端最新状态强制一次视觉同步，避免动画卡旧状态
@@ -4875,8 +4703,8 @@ function toggleBrokerPanel() {
         }
 
         function moveStar(time) {
-            // 禁用 Star 主角移动，由 DESK_AGENTS 固定工位替代
-            return;
+            // Use pending state if available (for target area during transition)
+            const effectiveState = pendingDesiredState || currentState;
             const stateInfo = STATES[effectiveState] || STATES.idle;
             const baseTarget = areas[stateInfo.area] || areas.breakroom;
 
@@ -4923,7 +4751,7 @@ function toggleBrokerPanel() {
                                     window.starWorking.setVisible(false);
                                     window.starWorking.anims.stop();
                                 }
-                                star.setVisible(false);
+                                star.setVisible(true);
                                 star.setScale(IDLE_STAR_SCALE);
                                 star.anims.play('star_idle', true);
                                 star.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
@@ -4934,7 +4762,7 @@ function toggleBrokerPanel() {
                                 star.setVisible(false);
                                 star.anims.stop();
                                 if (window.starWorking) {
-                                    window.starWorking.setVisible(false);
+                                    window.starWorking.setVisible(true);
                                     window.starWorking.anims.play('star_working', true);
                                 }
                             }
@@ -4951,7 +4779,7 @@ function toggleBrokerPanel() {
                                 window.starWorking.setVisible(false);
                                 window.starWorking.anims.stop();
                             }
-                            star.setVisible(false);
+                            star.setVisible(true);
                             star.setScale(IDLE_STAR_SCALE);
                             star.anims.play('star_idle', true);
                             star.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
@@ -4962,7 +4790,7 @@ function toggleBrokerPanel() {
                             star.setVisible(false);
                             star.anims.stop();
                             if (window.starWorking) {
-                                window.starWorking.setVisible(false);
+                                window.starWorking.setVisible(true);
                                 window.starWorking.anims.play('star_working', true);
                             }
                             sofa.anims.stop();
@@ -4978,7 +4806,7 @@ function toggleBrokerPanel() {
             if (!isMoving && currentState !== 'idle' && pendingDesiredState === null && (time - lastWanderAt) > 3500) {
                 targetX = baseTarget.x + (Math.random() - 0.5) * 60;
                 targetY = baseTarget.y + (Math.random() - 0.5) * 40;
-                star.setVisible(false);
+                star.setVisible(true);
                 star.anims.play('star_idle', true);
                 isMoving = true;
                 lastWanderAt = time;
@@ -5045,144 +4873,6 @@ function toggleBrokerPanel() {
         }
 
         // 假 Agent 气泡逻辑已移除，统一以真实 /agents 数据为准
-
-        // === F2 Desk View ===
-        const LOBSTER_API = '/lobster-admin/api';
-        const NAME_TO_LOBSTER_ID = {
-          'Sky 🌤️':'sky','K哥 📋':'manager','Pin哥 📌':'cto','Max 🔧':'devops',
-          '波哥 🌊':'backend','Jr 🎨':'frontend','Yang 🧪':'qa'
-        };
-
-        window.openDeskView = async function(agentId, name, state, detail) {
-          const old = document.getElementById('desk-overlay');
-          if (old) old.remove();
-
-          const stateLabelMap = {idle:'\u5f85\u547d',writing:'\u5de5\u4f5c\u4e2d',researching:'\u8c03\u7814\u4e2d',executing:'\u6267\u884c\u4e2d',syncing:'\u540c\u6b65\u4e2d',error:'\u5f02\u5e38'};
-          const stateEmoji = {idle:'\u{1f634}',writing:'\u{1f4bb}',researching:'\u{1f50d}',executing:'\u2699\ufe0f',syncing:'\u{1f504}',error:'\u{1f41b}'};
-          const lobsterId = (typeof NAME_TO_LOBSTER_ID !== 'undefined' ? NAME_TO_LOBSTER_ID[name] : null) || agentId;
-
-          const deskThemes = {
-            sky:     {color:'#4a90d9', items:['\u{1f4d6} Code Manual','\u2615 Americano','\u{1f3a7} Headphones']},
-            manager: {color:'#d4a44a', items:['\u{1f4cb} Progress','\u2615 Latte','\u{1f4f1} Phone']},
-            cto:     {color:'#e06050', items:['\u{1f4cc} Kanban','\u2615 Americano','\u{1f4da} Architecture']},
-            devops:  {color:'#a855f7', items:['\u{1f527} Toolkit','\u2615 Black Coffee','\u{1f50c} Cables']},
-            backend: {color:'#22c55e', items:['\u{1f30a} Ocean Mug','\u2615 Latte','\u{1f4d3} Notebook']},
-            frontend:{color:'#f59e0b', items:['\u{1f3a8} Design','\u2615 Latte','\u{1f58c}\ufe0f Stylus']},
-            qa:      {color:'#06b6d4', items:['\u{1f9ea} Test Report','\u2615 Green Tea','\u{1f41b} Bug List']},
-          };
-          const theme = deskThemes[agentId] || deskThemes.sky;
-
-          const overlay = document.createElement('div');
-          overlay.id = 'desk-overlay';
-          overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;font-family:ArkPixel,monospace;animation:deskFadeIn 0.3s ease;';
-
-          overlay.innerHTML = `
-            <style>
-              @keyframes deskFadeIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
-              @keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
-              @keyframes screenGlow{0%,100%{box-shadow:0 0 15px rgba(0,150,255,0.15)}50%{box-shadow:0 0 25px rgba(0,150,255,0.25)}}
-              #f2-scene{position:relative;width:960px;max-width:95vw;aspect-ratio:960/640;border-radius:8px;overflow:hidden;image-rendering:pixelated;box-shadow:0 20px 60px rgba(0,0,0,0.7)}
-              #f2-scene .bg{width:100%;height:100%;display:block}
-              #f2-main-screen{position:absolute;left:5%;top:38%;width:55%;height:52%;overflow-y:auto;padding:14px 16px;font-size:16px;color:#e2e8f0;line-height:1.6;background:rgba(0,0,0,0.75);border-radius:8px;border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(4px)}
-              #f2-main-screen::-webkit-scrollbar{width:5px}
-              #f2-main-screen::-webkit-scrollbar-thumb{background:rgba(0,150,255,0.4);border-radius:3px}
-              #f2-sec-screen{position:absolute;left:63%;top:38%;width:32%;height:52%;overflow-y:auto;padding:12px 14px;font-size:14px;color:#94a3b8;line-height:1.5;background:rgba(0,0,0,0.7);border-radius:8px;border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(4px)}
-              .f2-cmd{color:#00ffaa;font-weight:bold;font-size:14px;margin-bottom:4px}
-              .f2-info{color:#60a5fa;font-size:17px;font-weight:bold}
-              .f2-warn{color:#f59e0b;font-size:15px}
-              .f2-err{color:#ff0055;font-size:15px}
-              .f2-session{background:rgba(0,255,170,0.06);border-left:3px solid #00ffaa;padding:8px 10px;margin:6px 0;border-radius:4px;cursor:pointer;transition:background 0.2s}
-              .f2-session:hover{background:rgba(0,255,170,0.15)}
-              .f2-session-title{color:#e2e8f0;font-size:15px;font-weight:bold}
-              .f2-session-meta{color:#64748b;font-size:13px}
-              #f2-badge{position:absolute;top:3%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);padding:8px 24px;border-radius:6px;font-size:18px;font-weight:bold;letter-spacing:1px;border:2px solid ${theme.color};color:${theme.color};text-shadow:0 0 8px ${theme.color}}
-              #f2-items{position:absolute;bottom:4%;left:5%;right:35%;display:flex;gap:10px;flex-wrap:wrap}
-              #f2-items span{background:rgba(0,0,0,0.6);padding:4px 12px;border-radius:4px;color:#e2e8f0;font-size:13px;border:1px solid rgba(255,255,255,0.15)}
-              #f2-back{position:absolute;bottom:4%;right:3%;background:transparent;color:#00ffaa;border:2px solid #00ffaa;padding:8px 20px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:15px;transition:all 0.2s}
-              #f2-back:hover{background:rgba(0,255,170,0.2)}
-              #f2-time{position:absolute;bottom:5%;right:15%;color:#94a3b8;font-size:14px}
-            </style>
-            <div id="f2-scene">
-              <img class="bg" src="data:image/png;base64,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" />
-              <div id="f2-badge">${(stateEmoji[state]||'') + ' ' + name + ' ' + (stateLabelMap[state]||state)}</div>
-              <div id="f2-main-screen">
-                <div class="f2-cmd">$ lobster status ${lobsterId}</div>
-                <div style="color:#475569">\u52a0\u8f7d\u4e2d...<span style="animation:cursorBlink 1s infinite;background:#00ffaa;color:#000;padding:0 2px">\u258c</span></div>
-              </div>
-              <div id="f2-sec-screen">
-                <div style="color:#00ffaa;font-size:8px">SYSTEM</div>
-                <div style="color:#475569">\u52a0\u8f7d...</div>
-              </div>
-              <div id="f2-items">${theme.items.map(i=>'<span>'+i+'</span>').join('')}</div>
-              <div id="f2-time">${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</div>
-              <button id="f2-back" onclick="document.getElementById('desk-overlay').remove()">\u2190 \u8fd4\u56de\u529e\u516c\u5ba4</button>
-            </div>
-          `;
-          document.body.appendChild(overlay);
-          overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-
-          try {
-            const res = await fetch('/agents');
-            const allAgents = await res.json();
-            const agent = allAgents.find(a => a.agentId === lobsterId || a.name === name) || {};
-            const mainScreen = document.getElementById('f2-main-screen');
-            const secScreen = document.getElementById('f2-sec-screen');
-            if (!mainScreen) return;
-
-            let html = '';
-            html += '<div class="f2-cmd">$ lobster agent --id ' + lobsterId + '</div>';
-            html += '<div class="f2-info">' + (agent.name||name) + ' - ' + (agent.state||state) + '</div>';
-            html += '<div style="color:#94a3b8">' + (agent.detail||'\u65e0\u4efb\u52a1') + '</div>';
-            html += '<div class="f2-cmd" style="margin-top:4px">$ lobster sessions</div>';
-
-            const sessions = agent.sessions || [];
-            if (sessions.length === 0) {
-              html += '<div class="f2-warn">\u26a0 \u6682\u65e0\u6d3b\u8dc3 session</div>';
-            } else {
-              sessions.slice(0, 6).forEach((s, i) => {
-                const label = s.label || s.sessionKey || 'unknown';
-                const short = label.length > 35 ? label.slice(0,32)+'...' : label;
-                const ago = (typeof timeAgo === 'function') ? timeAgo(s.lastActivity) : '';
-                html += '<div class="f2-session">';
-                html += '<div class="f2-session-title">' + (i+1) + '. ' + short.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</div>';
-                html += '<div class="f2-session-meta">' + (s.kind||'') + ' \u00b7 ' + ago + '</div>';
-                html += '</div>';
-              });
-            }
-            html += '<div style="color:#334155;margin-top:4px">- end -<span style="animation:cursorBlink 1s infinite;background:#00ffaa;color:#000;padding:0 2px">\u258c</span></div>';
-            mainScreen.innerHTML = html;
-
-            // Secondary screen: system info
-            if (secScreen) {
-              let s2 = '<div style="color:#00ffaa;font-size:14px;font-weight:bold;margin-bottom:6px">📊 SYSTEM MONITOR</div>';
-              s2 += '<div style="color:#60a5fa;font-size:14px">Agent: ' + lobsterId + '</div>';
-              s2 += '<div style="font-size:14px">State: ' + (agent.state||'idle') + '</div>';
-              s2 += '<div style="font-size:14px">Area: ' + (agent.area||'-') + '</div>';
-              s2 += '<div style="font-size:14px">Auth: ' + (agent.authStatus||'-') + '</div>';
-              s2 += '<div style="color:#22c55e;margin-top:8px;font-size:14px">● Online</div>';
-              secScreen.innerHTML = s2;
-            }
-          } catch(e) {
-            const ms = document.getElementById('f2-main-screen');
-            if (ms) ms.innerHTML += '<div class="f2-err">\u274c ' + e.message + '</div>';
-          }
-        }
-
-
-
-        function timeAgo(iso) {
-          const diff = Date.now() - new Date(iso).getTime();
-          const m = Math.floor(diff/60000);
-          if (m < 1) return '刚刚';
-          if (m < 60) return m + '分钟前';
-          const h = Math.floor(m/60);
-          if (h < 24) return h + '小时前';
-          return Math.floor(h/24) + '天前';
-        }
-
-        function escHtml(s) {
-          return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        }
 
         // 启动游戏
         initGame();
