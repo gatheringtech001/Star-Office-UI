@@ -59,7 +59,7 @@ async function loadMemo() {
   const memoContent = document.getElementById('memo-content');
 
   try {
-    const response = await fetch('/yesterday-memo?t=' + Date.now(), { cache: 'no-store' });
+    const response = await fetch('yesterday-memo?t=' + Date.now(), { cache: 'no-store' });
     const data = await response.json();
 
     if (data.success && data.memo) {
@@ -221,6 +221,17 @@ const NAME_TAG_COLORS = {
 };
 
 // breakroom / writing / error 区域的 agent 分布位置（多 agent 时错开）
+// 每个 agent 的固定工位坐标（桌子位置）
+const AGENT_DESK_POSITIONS = {
+  'sky':      { x: 200, y: 180 },  // Sky 🌤️
+  'manager':  { x: 400, y: 180 },  // K哥 📋
+  'cto':      { x: 600, y: 180 },  // Pin哥 📌
+  'devops':   { x: 800, y: 180 },  // Max 🔧
+  'backend':  { x: 300, y: 380 },  // 波哥 🌊
+  'frontend': { x: 500, y: 380 },  // Jr 🎨
+  'qa':       { x: 700, y: 380 },  // Yang 🧪
+};
+
 const AREA_POSITIONS = {
   breakroom: [
     { x: 620, y: 180 },
@@ -257,7 +268,7 @@ const AREA_POSITIONS = {
 
 // 状态控制栏函数（用于测试）
 function setState(state, detail) {
-  fetch('/set_state', {
+  fetch('set_state', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ state, detail })
@@ -298,28 +309,34 @@ function preload() {
     hideLoadingOverlay();
   });
 
-  this.load.image('office_bg', '/static/office_bg_small' + (supportsWebP ? '.webp' : '.png') + '?v={{VERSION_TIMESTAMP}}');
-  this.load.spritesheet('star_idle', '/static/star-idle-spritesheet' + getExt('star-idle-spritesheet.png'), { frameWidth: 128, frameHeight: 128 });
-  this.load.spritesheet('star_researching', '/static/star-researching-spritesheet' + getExt('star-researching-spritesheet.png'), { frameWidth: 128, frameHeight: 105 });
+  this.load.image('office_bg', 'static/office_bg_small' + (supportsWebP ? '.webp' : '.png') + '?v={{VERSION_TIMESTAMP}}');
+  this.load.spritesheet('star_idle', 'static/star-idle-spritesheet' + getExt('star-idle-spritesheet.png'), { frameWidth: 128, frameHeight: 128 });
+  this.load.spritesheet('star_researching', 'static/star-researching-spritesheet' + getExt('star-researching-spritesheet.png'), { frameWidth: 128, frameHeight: 105 });
 
-  this.load.image('sofa_idle', '/static/sofa-idle' + getExt('sofa-idle.png'));
-  this.load.spritesheet('sofa_busy', '/static/sofa-busy-spritesheet' + getExt('sofa-busy-spritesheet.png'), { frameWidth: 256, frameHeight: 256 });
+  this.load.image('sofa_idle', 'static/sofa-idle' + getExt('sofa-idle.png'));
+  this.load.spritesheet('sofa_busy', 'static/sofa-busy-spritesheet' + getExt('sofa-busy-spritesheet.png'), { frameWidth: 256, frameHeight: 256 });
 
-  this.load.spritesheet('plants', '/static/plants-spritesheet' + getExt('plants-spritesheet.png'), { frameWidth: 160, frameHeight: 160 });
-  this.load.spritesheet('posters', '/static/posters-spritesheet' + getExt('posters-spritesheet.png'), { frameWidth: 160, frameHeight: 160 });
-  this.load.spritesheet('coffee_machine', '/static/coffee-machine-spritesheet' + getExt('coffee-machine-spritesheet.png'), { frameWidth: 230, frameHeight: 230 });
-  this.load.spritesheet('serverroom', '/static/serverroom-spritesheet' + getExt('serverroom-spritesheet.png'), { frameWidth: 180, frameHeight: 251 });
+  this.load.spritesheet('plants', 'static/plants-spritesheet' + getExt('plants-spritesheet.png'), { frameWidth: 160, frameHeight: 160 });
+  this.load.spritesheet('posters', 'static/posters-spritesheet' + getExt('posters-spritesheet.png'), { frameWidth: 160, frameHeight: 160 });
+  this.load.spritesheet('coffee_machine', 'static/coffee-machine-spritesheet' + getExt('coffee-machine-spritesheet.png'), { frameWidth: 230, frameHeight: 230 });
+  this.load.spritesheet('serverroom', 'static/serverroom-spritesheet' + getExt('serverroom-spritesheet.png'), { frameWidth: 180, frameHeight: 251 });
 
-  this.load.spritesheet('error_bug', '/static/error-bug-spritesheet-grid' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 180, frameHeight: 180 });
-  this.load.spritesheet('cats', '/static/cats-spritesheet' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 160, frameHeight: 160 });
-  this.load.image('desk', '/static/desk' + getExt('desk.png'));
-  this.load.spritesheet('star_working', '/static/star-working-spritesheet-grid' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 230, frameHeight: 144 });
-  this.load.spritesheet('sync_anim', '/static/sync-animation-spritesheet-grid' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 256, frameHeight: 256 });
-  this.load.image('memo_bg', '/static/memo-bg' + (supportsWebP ? '.webp' : '.png'));
+  this.load.spritesheet('error_bug', 'static/error-bug-spritesheet-grid' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 180, frameHeight: 180 });
+  this.load.spritesheet('cats', 'static/cats-spritesheet' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 160, frameHeight: 160 });
+  this.load.image('desk', 'static/desk' + getExt('desk.png'));
+  this.load.spritesheet('star_working', 'static/star-working-spritesheet-grid' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 230, frameHeight: 144 });
+  this.load.spritesheet('sync_anim', 'static/sync-animation-spritesheet-grid' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 256, frameHeight: 256 });
+  this.load.image('memo_bg', 'static/memo-bg' + (supportsWebP ? '.webp' : '.png'));
+
+  // 7 个 guest 角色 spritesheet (64x64 each frame, 2 frames)
+  for (let i = 1; i <= 6; i++) {
+    this.load.spritesheet('guest_role_' + i, 'static/guest_role_' + i + '.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('guest_anim_' + i, 'static/guest_anim_' + i + '.webp', { frameWidth: 64, frameHeight: 64 });
+  }
 
   // 新办公桌：强制 PNG（透明）
-  this.load.image('desk_v2', '/static/desk-v2.png');
-  this.load.spritesheet('flowers', '/static/flowers-spritesheet' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 65, frameHeight: 65 });
+  this.load.image('desk_v2', 'static/desk-v2.png');
+  this.load.spritesheet('flowers', 'static/flowers-spritesheet' + (supportsWebP ? '.webp' : '.png'), { frameWidth: 65, frameHeight: 65 });
 }
 
 function create() {
@@ -566,6 +583,66 @@ function create() {
 
   loadMemo();
   fetchStatus();
+
+  // === 7 个 agent 固定工位（Phaser 画布内） ===
+  const DESK_AGENTS = [
+    { id: 'sky',      name: 'Sky 🌤️',  role: 1, x: 180, y: 280 },
+    { id: 'manager',  name: 'K哥 📋',   role: 2, x: 420, y: 280 },
+    { id: 'cto',      name: 'Pin哥 📌', role: 3, x: 660, y: 280 },
+    { id: 'devops',   name: 'Max 🔧',   role: 4, x: 900, y: 280 },
+    { id: 'backend',  name: '波哥 🌊',  role: 5, x: 280, y: 490 },
+    { id: 'frontend', name: 'Jr 🎨',    role: 6, x: 560, y: 490 },
+    { id: 'qa',       name: 'Yang 🧪',  role: 1, x: 840, y: 490 },
+  ];
+
+  // 创建 guest 动画
+  for (let i = 1; i <= 6; i++) {
+    if (!this.anims.exists('guest_idle_' + i)) {
+      this.anims.create({
+        key: 'guest_idle_' + i,
+        frames: this.anims.generateFrameNumbers('guest_role_' + i, { start: 0, end: 1 }),
+        frameRate: 2,
+        repeat: -1
+      });
+    }
+    if (!this.anims.exists('guest_work_' + i)) {
+      this.anims.create({
+        key: 'guest_work_' + i,
+        frames: this.anims.generateFrameNumbers('guest_anim_' + i, { start: 0, end: 1 }),
+        frameRate: 4,
+        repeat: -1
+      });
+    }
+  }
+
+  window._deskAgentSprites = {};
+  DESK_AGENTS.forEach(da => {
+    // 桌子已画在背景里，不需要额外 sprite
+
+    // agent sprite (坐在桌子前) — 大尺寸清晰可见
+    const agentSprite = game.add.sprite(da.x, da.y - 20, 'guest_role_' + da.role).setOrigin(0.5).setScale(1.8).setDepth(15);
+    agentSprite.anims.play('guest_idle_' + da.role, true);
+    agentSprite.setInteractive({ useHandCursor: true });
+    agentSprite.on('pointerdown', ((agentId, agentName, agentState) => () => {
+      if (typeof openDeskView === 'function') {
+        openDeskView(agentId, agentName, agentState, '');
+      }
+    })(da.id, da.name, 'idle'));
+
+    // 名字标签 — 大号醒目
+    const nameLabel = game.add.text(da.x, da.y - 60, da.name, {
+      fontFamily: 'ArkPixel, monospace',
+      fontSize: '16px',
+      fill: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 4,
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      padding: { x: 6, y: 3 }
+    }).setOrigin(0.5).setDepth(20);
+
+    window._deskAgentSprites[da.id] = { sprite: agentSprite, name: nameLabel, role: da.role };
+  });
+
   fetchAgents();
 
   // 可选调试：仅在显式开启 debug 模式时渲染测试用尼卡 agent
@@ -701,7 +778,7 @@ function normalizeState(s) {
 }
 
 function fetchStatus() {
-  fetch('/status')
+  fetch('status')
     .then(response => response.json())
     .then(data => {
       const nextState = normalizeState(data.state);
@@ -912,10 +989,13 @@ function showCatBubble() {
 }
 
 function fetchAgents() {
-  fetch('/agents?t=' + Date.now(), { cache: 'no-store' })
-    .then(response => response.json())
+  fetch('agents?t=' + Date.now(), { cache: 'no-store' })
+    .then(response => {
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      return response.json();
+    })
     .then(data => {
-      if (!Array.isArray(data)) return;
+      if (!Array.isArray(data) || data.length === 0) return; // keep old data
       // 重置位置计数器
       // 按区域分配不同位置索引，避免重叠
       const areaSlots = { breakroom: 0, writing: 0, error: 0 };
@@ -924,6 +1004,21 @@ function fetchAgents() {
         agent._slotIndex = areaSlots[area] || 0;
         areaSlots[area] = (areaSlots[area] || 0) + 1;
         renderAgent(agent);
+
+        // 更新固定工位 sprite 动画
+        if (window._deskAgentSprites && window._deskAgentSprites[agent.agentId]) {
+          const da = window._deskAgentSprites[agent.agentId];
+          const state = agent.state || 'idle';
+          const authStatus = agent.authStatus || 'pending';
+          if (state === 'writing' || state === 'executing' || state === 'researching') {
+            da.sprite.anims.play('guest_work_' + da.role, true);
+          } else {
+            da.sprite.anims.play('guest_idle_' + da.role, true);
+          }
+          // 离线半透明
+          da.sprite.setAlpha(authStatus === 'offline' ? 0.4 : 1);
+          da.name.setAlpha(authStatus === 'offline' ? 0.4 : 1);
+        }
       }
       // 移除不再存在的 agent
       const currentIds = new Set(data.map(a => a.agentId));
@@ -937,7 +1032,8 @@ function fetchAgents() {
       }
     })
     .catch(error => {
-      console.error('拉取 agents 失败:', error);
+      console.warn('拉取 agents 失败，保留旧数据:', error.message);
+      // 不清空现有 agents，静默忽略
     });
 }
 
@@ -954,8 +1050,9 @@ function renderAgent(agent) {
   const authStatus = agent.authStatus || 'pending';
   const isMain = !!agent.isMain;
 
-  // 获取这个 agent 在区域里的位置
-  const pos = getAreaPosition(area, agent._slotIndex || 0);
+  // 获取这个 agent 在区域里的位置（优先使用固定工位）
+  const deskPos = AGENT_DESK_POSITIONS[agentId];
+  const pos = deskPos || getAreaPosition(area, agent._slotIndex || 0);
   const baseX = pos.x;
   const baseY = pos.y;
 
@@ -974,10 +1071,12 @@ function renderAgent(agent) {
     const container = game.add.container(baseX, baseY);
     container.setDepth(1200 + (isMain ? 100 : 0)); // 放到最顶层！
 
-    // 像素小人：用星星图标，更明显
-    const starIcon = game.add.text(0, 0, '⭐', {
+    // 像素小人：用 agent 名字里的 emoji 或默认图标
+    const AGENT_AVATARS = {'Sky':'🌤️','K哥':'📋','Pin哥':'📌','Max':'🔧','波哥':'🌊','Jr':'🎨','Yang':'🧪','Star':'⭐'};
+    const avatarEmoji = AGENT_AVATARS[name.split(' ')[0]] || '🧑‍💻';
+    const starIcon = game.add.text(0, 0, avatarEmoji, {
       fontFamily: 'ArkPixel, monospace',
-      fontSize: '32px'
+      fontSize: '36px'
     }).setOrigin(0.5);
     starIcon.name = 'starIcon';
 
@@ -1003,6 +1102,23 @@ function renderAgent(agent) {
     statusDot.name = 'statusDot';
 
     container.add([starIcon, statusDot, nameTag]);
+
+    // 如果是固定工位 agent，画一张桌子在 agent 下方
+    if (AGENT_DESK_POSITIONS[agentId]) {
+      // 桌子（像素风矩形）
+      const desk = game.add.rectangle(0, 28, 64, 24, 0x8b5e3c);
+      desk.setStrokeStyle(2, 0x5c3a1e);
+      desk.name = 'desk';
+      // 桌子上的小电脑
+      const monitor = game.add.rectangle(-10, 18, 16, 12, 0x1e293b);
+      monitor.setStrokeStyle(1, 0x64748b);
+      monitor.name = 'monitor';
+      // 电脑屏幕亮光
+      const screen = game.add.rectangle(-10, 17, 12, 8, 0x38bdf8);
+      screen.name = 'screen';
+      container.addAt([desk, monitor, screen], 0); // 放在 agent 底下
+    }
+
     agents[agentId] = container;
   } else {
     // 更新 agent

@@ -318,12 +318,25 @@ DEFAULT_AGENTS = [
         "authStatus": "approved",
         "authExpiresAt": None,
         "lastPushAt": None
-    }
+    },
+    {"agentId": "sky", "name": "Sky 🌤️", "isMain": False, "state": "writing", "detail": "前端开发中", "area": "writing", "source": "team", "joinKey": None, "authStatus": "approved", "authExpiresAt": None, "lastPushAt": None, "updated_at": datetime.now().isoformat()},
+    {"agentId": "manager", "name": "K哥 📋", "isMain": False, "state": "writing", "detail": "项目管理中", "area": "writing", "source": "team", "joinKey": None, "authStatus": "approved", "authExpiresAt": None, "lastPushAt": None, "updated_at": datetime.now().isoformat()},
+    {"agentId": "cto", "name": "Pin哥 📌", "isMain": False, "state": "writing", "detail": "技术架构中", "area": "writing", "source": "team", "joinKey": None, "authStatus": "approved", "authExpiresAt": None, "lastPushAt": None, "updated_at": datetime.now().isoformat()},
+    {"agentId": "devops", "name": "Max 🔧", "isMain": False, "state": "writing", "detail": "运维部署中", "area": "writing", "source": "team", "joinKey": None, "authStatus": "approved", "authExpiresAt": None, "lastPushAt": None, "updated_at": datetime.now().isoformat()},
+    {"agentId": "backend", "name": "波哥 🌊", "isMain": False, "state": "writing", "detail": "后端开发中", "area": "writing", "source": "team", "joinKey": None, "authStatus": "approved", "authExpiresAt": None, "lastPushAt": None, "updated_at": datetime.now().isoformat()},
+    {"agentId": "frontend", "name": "Jr 🎨", "isMain": False, "state": "idle", "detail": "休息中", "area": "breakroom", "source": "team", "joinKey": None, "authStatus": "approved", "authExpiresAt": None, "lastPushAt": None, "updated_at": datetime.now().isoformat()},
+    {"agentId": "qa", "name": "Yang 🧪", "isMain": False, "state": "writing", "detail": "QA测试中", "area": "writing", "source": "team", "joinKey": None, "authStatus": "approved", "authExpiresAt": None, "lastPushAt": None, "updated_at": datetime.now().isoformat()},
 ]
 
 
 def load_agents_state():
-    return _store_load_agents_state(AGENTS_STATE_FILE, DEFAULT_AGENTS)
+    agents = _store_load_agents_state(AGENTS_STATE_FILE, DEFAULT_AGENTS)
+    # Ensure all DEFAULT_AGENTS are present (merge missing ones)
+    existing_ids = {a.get("agentId") for a in agents}
+    for da in DEFAULT_AGENTS:
+        if da["agentId"] not in existing_ids:
+            agents.append(dict(da))
+    return agents
 
 
 def save_agents_state(agents):
@@ -816,6 +829,18 @@ def state_to_area(state):
 # Ensure files exist
 if not os.path.exists(AGENTS_STATE_FILE):
     save_agents_state(DEFAULT_AGENTS)
+
+# Auto-seed team agents on every startup
+try:
+    import importlib.util
+    _seed_path = os.path.join(ROOT_DIR, "seed-agents.py")
+    if os.path.exists(_seed_path):
+        _spec = importlib.util.spec_from_file_location("seed_agents", _seed_path)
+        _mod = importlib.util.module_from_spec(_spec)
+        _spec.loader.exec_module(_mod)
+        _mod.seed()
+except Exception as _e:
+    print(f"[WARN] seed-agents failed: {_e}")
 if not os.path.exists(JOIN_KEYS_FILE):
     if os.path.exists(os.path.join(ROOT_DIR, "join-keys.sample.json")):
         try:
@@ -845,7 +870,8 @@ def get_agents():
     keys_data = load_join_keys()
 
     for a in agents:
-        if a.get("isMain"):
+        if a.get("isMain") or a.get("source") in ("seed", "team"):
+            # Seed/team agents are permanent team members — never clean up
             cleaned_agents.append(a)
             continue
 
