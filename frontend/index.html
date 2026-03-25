@@ -1552,7 +1552,7 @@
             pixelArt: true,
             backgroundColor: '#b1b1b1',
             scale: {
-                mode: Phaser.Scale.FIT,
+                mode: Phaser.Scale.RESIZE,
                 autoCenter: Phaser.Scale.CENTER_BOTH,
                 width: 1280,
                 height: 960
@@ -4415,23 +4415,11 @@ function toggleBrokerPanel() {
             // 记录初始是否已手动平移（避免 resize 时把用户拖好的位置重置）
             let hasManuallyPanned = false;
             function applyMobileCameraFit() {
-                // 所有设备都需要 zoom fit
-                const h = Math.max(1, camera.height);
-                const w = Math.max(1, camera.width);
-
-                // 关键：先按高度 fit，再看是否需要按宽度微调，
-                // 保证既不会让画面歪，又能左右拖到最左最右边缘不被裁。
-                const fitHeightZoom = h / MAP_H;
-                const fitWidthZoom = w / MAP_W;
-                const candidateZoom = Math.min(fitHeightZoom, fitWidthZoom) * 0.95; // 5% padding — 保证全图可见含顶部
-
-                // 按 candidateZoom 计算：viewport 在世界坐标里的宽高
-                const viewW = w / candidateZoom;
-                const maxX = Math.max(0, MAP_W - viewW);
-
-                camera.setZoom(candidateZoom);
-                // 始终居中显示完整地图
-                camera.centerOn(MAP_W / 2 + 80, MAP_H / 2 + 40);
+                const w = Math.max(1, window.innerWidth);
+                const h = Math.max(1, window.innerHeight);
+                const zoom = Math.min(w / MAP_W, h / MAP_H);
+                camera.setZoom(zoom);
+                camera.centerOn(MAP_W / 2, MAP_H / 2);
             }
             applyMobileCameraFit();
 
@@ -4445,7 +4433,7 @@ function toggleBrokerPanel() {
 
             camera.setBounds(-100, -80, 1580, 1120);
             // centerOn after bounds to shift view toward office area
-            camera.centerOn(MAP_W / 2 + 80, MAP_H / 2 + 40);
+            camera.centerOn(MAP_W / 2, MAP_H / 2);
 
             function setPanEnabled(on) {
                 panEnabled = on;
