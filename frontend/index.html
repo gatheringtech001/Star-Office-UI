@@ -4566,16 +4566,16 @@ function toggleBrokerPanel() {
 
             // === 7 个 agent 固定工位（Phaser 画布内直接渲染）===
             const DESK_AGENTS = [
-                // 全部集中在办公区 — 4+3 布局
+                // 全部集中在办公区 — 4+3 布局（K哥 指定坐标）
                 // 上排 4人
-                { id: 'backend',  name: '波哥 🌊',  char: 'adam',  x: 920,  y: 555 },
-                { id: 'sky',      name: 'Sky 🌤️',  char: 'adam',  x: 1000, y: 555 },
-                { id: 'cto',      name: 'Pin哥 📌', char: 'lucy',  x: 1080, y: 555 },
-                { id: 'manager',  name: 'K哥 📋',   char: 'ash',   x: 1160, y: 555 },
+                { id: 'sky',      name: 'Sky 🌤️',  char: 'adam',  x: 700,  y: 550 },
+                { id: 'cto',      name: 'Pin哥 📌', char: 'lucy',  x: 850,  y: 550 },
+                { id: 'frontend', name: 'Jr 🎨',    char: 'ash',   x: 1000, y: 550 },
+                { id: 'manager',  name: 'K哥 📋',   char: 'ash',   x: 1150, y: 550 },
                 // 下排 3人
-                { id: 'devops',   name: 'Max 🔧',   char: 'nancy', x: 960,  y: 715 },
-                { id: 'frontend', name: 'Jr 🎨',    char: 'ash',   x: 1050, y: 715 },
-                { id: 'qa',       name: 'Yang 🧪',  char: 'lucy',  x: 1130, y: 715 },
+                { id: 'backend',  name: '波哥 🌊',  char: 'adam',  x: 700,  y: 750 },
+                { id: 'devops',   name: 'Max 🔧',   char: 'nancy', x: 850,  y: 750 },
+                { id: 'qa',       name: 'Yang 🧪',  char: 'lucy',  x: 1000, y: 750 },
             ];
 
             // 创建原版角色动画（atlas 格式）
