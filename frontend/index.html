@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Star 的像素办公室</title>
     <style>
+        /* v14: 隐藏旧 UI 元素 */
+        #status-text, #btn-pan-view, #btn-show-coords, #memo-panel, #memo-placeholder,
+        #control-bar, #asset-drawer, #asset-drawer-backdrop, #asset-highlight,
+        .lang-btn-group { display: none !important; }
         @font-face {
             font-family: 'ArkPixel';
             src: url('static/fonts/ark-pixel-12px-proportional-zh_cn.ttf.woff2') format('woff2');
@@ -4119,13 +4123,15 @@ function toggleBrokerPanel() {
                 window._deskAgentSprites[da.id] = { sprite: agentSprite, nameLabel, stateLabel };
             });
 
-            // Camera zoom to fit
+            // Camera zoom to show office area
             const cam = this.cameras.main;
             cam.setBounds(0, 0, 1280, 960);
             const updateZoom = () => {
                 const w = this.scale.width;
                 const h = this.scale.height;
+                // Zoom to fit full map, but center on office area
                 cam.setZoom(Math.min(w / 1280, h / 960));
+                cam.centerOn(1050, 600); // office area center
             };
             updateZoom();
             this.scale.on('resize', updateZoom);
