@@ -4044,7 +4044,7 @@ function toggleBrokerPanel() {
             loadingText = document.getElementById('loading-text');
             loadingProgressContainer = document.getElementById('loading-progress-container');
 
-            totalAssets = 6;
+            totalAssets = 5;
             loadedAssets = 0;
 
             this.load.on('filecomplete', () => { updateLoadingProgress(); });
@@ -4052,7 +4052,7 @@ function toggleBrokerPanel() {
 
             // === v13: 原版 SkyOffice tilemap 背景 + 角色坐姿 ===
             this.load.image('office_bg', 'static/tilemap/office_map.webp?v={{VERSION_TIMESTAMP}}');
-            this.load.image('desk_fg', 'static/tilemap/desk_overlay.png?v={{VERSION_TIMESTAMP}}');
+            // desk_overlay removed (v14i): was covering monitors
 
             // 角色坐姿 sprite（从原版 atlas 裁剪的单帧 32x48）
             this.load.image('char_adam_sit', 'static/char_adam_sit.png?v={{VERSION_TIMESTAMP}}');
@@ -4075,7 +4075,7 @@ function toggleBrokerPanel() {
             officeBgSprite.setDepth(0);
 
             // 桌子前景层（遮挡正面角色下半身）
-            this.add.image(640, 480, 'desk_fg').setDepth(150);
+            // desk_fg overlay removed (v14i)
 
             // === 7 个 agent 固定工位（坐在原版地图的办公区椅子上）===
             const DESK_AGENTS = [
