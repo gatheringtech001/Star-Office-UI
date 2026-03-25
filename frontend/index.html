@@ -4131,10 +4131,10 @@ function toggleBrokerPanel() {
             const updateZoom = () => {
                 const w = this.scale.width;
                 const h = this.scale.height;
-                // Office area spans ~350px wide (x:930-1250), ~450px tall (y:430-880)
-                const officeW = 600, officeH = 600;
-                cam.setZoom(Math.min(w / officeW, h / officeH) * 0.88);
-                cam.centerOn(1080, 660);
+                // All agents: x=992-1200, y=436-880 → center (1096, 658), span ~250x500
+                const officeW = 450, officeH = 550;
+                cam.setZoom(Math.min(w / officeW, h / officeH) * 0.85);
+                cam.centerOn(1096, 658);
             };
             updateZoom();
             this.scale.on('resize', updateZoom);
