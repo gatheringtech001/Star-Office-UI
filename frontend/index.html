@@ -4127,15 +4127,18 @@ function toggleBrokerPanel() {
 
             // Camera zoom to office area (v14h: show all 7 agents)
             const cam = this.cameras.main;
-            cam.setBounds(0, 0, 1280, 960);
+            // No bounds — let camera freely center on office area
             const updateZoom = () => {
                 const w = this.scale.width;
                 const h = this.scale.height;
                 // Zoom tight on office area only
                 // agents y: 436(names)~870(yang bottom), x: 960~1220
                 // visible span needed: ~300w x ~500h
-                cam.setZoom(Math.min(w / 300, h / 480));
-                cam.centerOn(1100, 630);
+                // Fill screen with office area only
+                const zoomX = w / 350;  // office width ~350px (x:940-1280)
+                const zoomY = h / 500;  // office height ~500px (y:420-920)
+                cam.setZoom(Math.min(zoomX, zoomY));
+                cam.centerOn(1110, 640);
             };
             updateZoom();
             this.scale.on('resize', updateZoom);
