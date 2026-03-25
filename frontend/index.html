@@ -1150,7 +1150,7 @@
 <body>
     <!-- 加载遮罩 -->
     <div id="loading-overlay">
-        <div id="loading-text">Loading Star\u0027s pixel office...</div>
+        <div id="loading-text">加载办公室中...</div>
         <div id="loading-progress-container">
             <div id="loading-progress-bar"></div>
         </div>
@@ -4046,6 +4046,7 @@ function toggleBrokerPanel() {
 
             // === v13: 原版 SkyOffice tilemap 背景 + 角色坐姿 ===
             this.load.image('office_bg', 'static/tilemap/office_map.webp?v={{VERSION_TIMESTAMP}}');
+            this.load.image('desk_fg', 'static/tilemap/desk_overlay.png?v={{VERSION_TIMESTAMP}}');
 
             // 角色坐姿 sprite（从原版 atlas 裁剪的单帧 32x48）
             this.load.image('char_adam_sit', 'static/char_adam_sit.png?v={{VERSION_TIMESTAMP}}');
@@ -4067,6 +4068,9 @@ function toggleBrokerPanel() {
             officeBgSprite = this.add.image(640, 480, 'office_bg');
             officeBgSprite.setDepth(0);
 
+            // 桌子前景层（遮挡正面角色下半身）
+            this.add.image(640, 480, 'desk_fg').setDepth(150);
+
             // === 7 个 agent 固定工位（坐在原版地图的办公区椅子上）===
             const DESK_AGENTS = [
                 { id: 'sky',      name: 'Sky',   tag: '全栈', char: 'adam',  ox: 1088, oy: 480, dir: 'down' },
@@ -4075,7 +4079,7 @@ function toggleBrokerPanel() {
                 { id: 'devops',   name: 'Max',   tag: '运维', char: 'nancy', ox: 1184, oy: 576, dir: 'up' },
                 { id: 'backend',  name: '波哥',  tag: '后端', char: 'nancy', ox: 992,  oy: 736, dir: 'down' },
                 { id: 'frontend', name: 'Jr',    tag: '前端', char: 'lucy',  ox: 1088, oy: 736, dir: 'down' },
-                { id: 'qa',       name: 'Yang',  tag: 'QA',   char: 'adam',  ox: 1184, oy: 736, dir: 'down' },
+                { id: 'qa',       name: 'Yang',  tag: 'QA',   char: 'adam',  ox: 1184, oy: 832, dir: 'up' },
             ];
 
             window._deskAgentSprites = {};
@@ -4135,7 +4139,7 @@ function toggleBrokerPanel() {
 
             fetchStatus();
             fetchGuestAgents();
-
+        }
 
         function update(time) {
             if (time - lastFetch > FETCH_INTERVAL) { fetchStatus(); lastFetch = time; }
