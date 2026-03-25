@@ -3479,7 +3479,7 @@ function toggleBrokerPanel() {
                 const stateText = stateMap[state] || state;
                 const subtitle = `${statusText} · ${stateText}`;
 
-                const pendingActions = `<button onclick="openDeskView('${agent.agentId}','${name.replace(/'/g,"\\'")}','${state}','${agent.detail||''}')">${btnT.desk}</button><button onclick="alert('${lang==='en'?'Skill swap coming soon':lang==='ja'?'スキル交換機能開発中':'交换 skill 功能开发中'}')">${btnT.skill}</button><button class="leave-btn" onclick="leaveGuestAgent('${agent.agentId}','${name}')">${btnT.leave}</button>`;
+                const pendingActions = '<button onclick="openDeskView('' + agent.agentId + '','' + name.replace(/'/g,"\\'") + '','' + state + '','' + (agent.detail||'') + '')">查看桌面</button>';
 
                 return `
                   <div class="guest-agent-item" data-name="${name}">
@@ -4125,24 +4125,21 @@ function toggleBrokerPanel() {
                 window._deskAgentSprites[da.id] = { sprite: agentSprite, nameLabel, stateLabel };
             });
 
-            // Camera zoom to show office area
+            // Camera zoom to office area (v14f: tighter zoom on work area)
             const cam = this.cameras.main;
             cam.setBounds(0, 0, 1280, 960);
             const updateZoom = () => {
                 const w = this.scale.width;
                 const h = this.scale.height;
-                cam.setZoom(Math.min(w / 1280, h / 960) * 0.95);
-                cam.centerOn(900, 550);
+                // Focus on office area ~400x500 region
+                const officeW = 500, officeH = 550;
+                cam.setZoom(Math.min(w / officeW, h / officeH) * 0.9);
+                cam.centerOn(1060, 650);
             };
             updateZoom();
             this.scale.on('resize', updateZoom);
 
-            // 牌匾
-            this.add.rectangle(640, 930, 300, 30, 0x5d4037).setStrokeStyle(2, 0x8b6914).setDepth(200);
-            this.add.text(640, 930, '\u{1f99e} 海辛小龙虾工作室', {
-                fontFamily: 'ArkPixel, monospace', fontSize: '12px', fill: '#f5deb3',
-                stroke: '#3e2723', strokeThickness: 2
-            }).setOrigin(0.5).setDepth(201);
+            // 牌匾 (v14f: 已隐藏)
 
             fetchStatus();
             fetchGuestAgents();
