@@ -4417,7 +4417,7 @@ function toggleBrokerPanel() {
             function applyMobileCameraFit() {
                 const w = Math.max(1, window.innerWidth);
                 const h = Math.max(1, window.innerHeight);
-                const zoom = Math.min(w / MAP_W, h / MAP_H);
+                const zoom = Math.min(w / MAP_W, h / MAP_H) * 0.88;
                 camera.setZoom(zoom);
                 camera.centerOn(MAP_W / 2, MAP_H / 2);
             }
