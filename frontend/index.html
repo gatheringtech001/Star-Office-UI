@@ -4270,9 +4270,8 @@ function toggleBrokerPanel() {
         }
 
         function applyVisualState(nextState) {
-            // 禁用原版 Star 角色动画，由 DESK_AGENTS 替代
-            if (star) star.setVisible(false);
-            if (window.starWorking) { window.starWorking.setVisible(false); window.starWorking.anims.stop(); }
+            // v14: 旧 sprite 全部移除，直接 return
+            return;
 
             // 保留 server room 和 sync 动画
             if (nextState === 'idle') {
