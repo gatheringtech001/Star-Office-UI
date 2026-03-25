@@ -4217,6 +4217,42 @@ function toggleBrokerPanel() {
                 window.flowerSprite.setFrame(next);
             });
 
+            // ====== 7 人固定工位 ======
+            const DESK_AGENTS = [
+                // 上排 4人 (y=200)
+                { id: 'backend',  name: '波哥',  role: 5, x: 250,  y: 250 },
+                { id: 'sky',      name: 'Sky',   role: 1, x: 500,  y: 250 },
+                { id: 'cto',      name: 'Pin哥', role: 3, x: 750,  y: 250 },
+                { id: 'manager',  name: 'K哥',   role: 2, x: 1000, y: 250 },
+                // 下排 3人 (y=500)
+                { id: 'devops',   name: 'Max',   role: 4, x: 370,  y: 500 },
+                { id: 'frontend', name: 'Jr',    role: 6, x: 640,  y: 500 },
+                { id: 'qa',       name: 'Yang',  role: 1, x: 910,  y: 500 },
+            ];
+            window._deskAgentSprites = {};
+            DESK_AGENTS.forEach(da => {
+                // 桌子
+                const deskSp = game.add.image(da.x, da.y + 12, 'desk_v2').setOrigin(0.5).setScale(1.5).setDepth(1500);
+                // 角色 sprite（静态帧 0）
+                const charKey = 'guest_role_' + da.role;
+                const agentSp = game.add.sprite(da.x, da.y, charKey, 0).setOrigin(0.5).setScale(4.0).setDepth(1502);
+                agentSp.setInteractive({ useHandCursor: true });
+                agentSp.on('pointerdown', () => {
+                    if (typeof openDeskView === 'function') openDeskView(da.id, da.name, 'idle', '');
+                });
+                // 名字标签
+                const nameLabel = game.add.text(da.x, da.y - 80, da.name, {
+                    fontFamily: 'ArkPixel, monospace', fontSize: '28px', fill: '#ffffff',
+                    stroke: '#000000', strokeThickness: 4, fontStyle: 'bold'
+                }).setOrigin(0.5).setDepth(1510);
+                // 状态标签
+                const statusLabel = game.add.text(da.x, da.y + 60, '工作中', {
+                    fontFamily: 'ArkPixel, monospace', fontSize: '18px', fill: '#94a3b8',
+                    stroke: '#000000', strokeThickness: 2
+                }).setOrigin(0.5).setDepth(1510);
+                window._deskAgentSprites[da.id] = { sprite: agentSp, desk: deskSp, nameLabel, statusLabel };
+            });
+
             // Star working at desk (217,333)
             this.anims.create({
                 key: 'star_working',
@@ -4873,6 +4909,67 @@ function toggleBrokerPanel() {
         }
 
         // 假 Agent 气泡逻辑已移除，统一以真实 /agents 数据为准
+
+        // ====== F2 桌面特写 ======
+        window.openDeskView = async function(agentId, name, state, detail) {
+          const old = document.getElementById('desk-overlay');
+          if (old) old.remove();
+          const overlay = document.createElement('div');
+          overlay.id = 'desk-overlay';
+          overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;font-family:ArkPixel,monospace;';
+          overlay.innerHTML = `
+            <div style="width:700px;max-width:95vw;background:#1e293b;border-radius:12px;padding:24px;border:2px solid #334155;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <div style="font-size:22px;font-weight:bold;color:#e2e8f0;">${name}</div>
+                <button onclick="document.getElementById('desk-overlay').remove()" style="background:transparent;color:#94a3b8;border:1px solid #475569;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:14px;">\u2190 返回</button>
+              </div>
+              <div id="f2-main" style="color:#94a3b8;font-size:16px;line-height:1.8;">
+                <div style="color:#00ffaa;">$ lobster status ${agentId}</div>
+                <div>加载中...<span style="animation:cursorBlink 1s infinite;color:#00ffaa;">█</span></div>
+              </div>
+              <div id="f2-sec" style="margin-top:16px;padding:12px;background:rgba(0,0,0,0.3);border-radius:8px;color:#64748b;font-size:14px;">
+                <div style="color:#00ffaa;font-weight:bold;">📊 SYSTEM</div>
+                <div>加载中...</div>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(overlay);
+          overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+          try {
+            const res = await fetch('/agents');
+            const all = await res.json();
+            const agent = all.find(a => a.agentId === agentId || a.name === name) || {};
+            const m = document.getElementById('f2-main');
+            if (m) {
+              let h = '<div style="color:#00ffaa;">$ lobster agent --id ' + agentId + '</div>';
+              h += '<div style="color:#60a5fa;font-size:18px;font-weight:bold;">' + (agent.name||name) + ' - ' + (agent.state||state||'idle') + '</div>';
+              h += '<div>' + (agent.detail||'无任务') + '</div>';
+              const sessions = agent.sessions || [];
+              if (sessions.length) {
+                h += '<div style="color:#00ffaa;margin-top:8px;">$ lobster sessions</div>';
+                sessions.slice(0,6).forEach((s,i) => {
+                  h += '<div style="background:rgba(0,255,170,0.06);border-left:3px solid #00ffaa;padding:6px 10px;margin:4px 0;border-radius:4px;">';
+                  h += '<div style="color:#e2e8f0;font-weight:bold;">' + (i+1) + '. ' + (s.label||s.sessionKey||'?') + '</div>';
+                  h += '<div style="color:#64748b;font-size:13px;">' + (s.kind||'') + '</div></div>';
+                });
+              } else {
+                h += '<div style="color:#f59e0b;margin-top:8px;">⚠ 暂无活跃 session</div>';
+              }
+              m.innerHTML = h;
+            }
+            const sec = document.getElementById('f2-sec');
+            if (sec) {
+              sec.innerHTML = '<div style="color:#00ffaa;font-weight:bold;">📊 SYSTEM MONITOR</div>'
+                + '<div style="color:#60a5fa;">Agent: ' + (agent.agentId||agentId) + '</div>'
+                + '<div>State: ' + (agent.state||'idle') + '</div>'
+                + '<div>Auth: ' + (agent.authStatus||'-') + '</div>'
+                + '<div style="color:#22c55e;margin-top:4px;">● Online</div>';
+            }
+          } catch(e) {
+            const m = document.getElementById('f2-main');
+            if (m) m.innerHTML += '<div style="color:#ff0055;">❌ ' + e.message + '</div>';
+          }
+        };
 
         // 启动游戏
         initGame();
