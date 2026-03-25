@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Star 的像素办公室</title>
     <style>
+        /* ===== v209 隐藏不需要的 UI ===== */
+        #lang-toggle-group { display:none!important; }
+        #memo-panel { display:none!important; }
+        #control-bar { display:none!important; }
+        #asset-drawer, #asset-drawer-backdrop, #asset-highlight { display:none!important; }
+        #status-text { display:none!important; }
+        #btn-pan-view, #btn-show-coords, #coords-toggle, #pan-toggle { display:none!important; }
         @font-face {
             font-family: 'ArkPixel';
             src: url('/static/fonts/ark-pixel-12px-proportional-zh_cn.ttf.woff2') format('woff2');
@@ -2139,7 +2146,7 @@
             selectionBoxGraphics.lineStyle(4, 0x22c55e, 1);
             selectionBoxGraphics.strokeRect(b.x, b.y, b.width, b.height);
             selectionBoxGraphics.setDepth(999999);
-            selectionBoxGraphics.setVisible(true);
+            selectionBoxGraphics.setVisible(false);
             return true;
         }
 
@@ -3450,7 +3457,7 @@ function toggleBrokerPanel() {
                 const stateText = stateMap[state] || state;
                 const subtitle = `${statusText} · ${stateText}`;
 
-                const pendingActions = `<button onclick="alert('交换 skill 功能开发中')">交换skill</button><button class="leave-btn" onclick="leaveGuestAgent('${agent.agentId}','${name}')">离开房间</button>`;
+                const pendingActions = '';
 
                 return `
                   <div class="guest-agent-item" data-name="${name}">
@@ -3526,6 +3533,7 @@ function toggleBrokerPanel() {
         }
 
         function renderGuestAgentsInScene() {
+            return; // 禁用旧 guest agent 场景渲染，改用固定工位 DESK_AGENTS
             if (!game) return;
             const visitors = getMergedVisitors();
             const seenIds = new Set();
@@ -4077,7 +4085,7 @@ function toggleBrokerPanel() {
             star.setAlpha(0.95);
             star.setDepth(20); // Put Star on top of everything
             // Default: idle shows Star idle animation
-            star.setVisible(true);
+            star.setVisible(false);
             star.anims.play('star_idle', true);
 
             // Sofa stays static when idle (no longer the main idle animation)
@@ -4240,7 +4248,7 @@ function toggleBrokerPanel() {
                 const deskSp = game.add.image(da.x, da.y + 12, 'desk_v2').setOrigin(0.5).setScale(1.5).setDepth(1500);
                 // SkyOffice 坐姿角色
                 const charKey = 'char_' + da.char + '_sit';
-                const agentSp = game.add.image(da.x, da.y - 10, charKey).setOrigin(0.5, 1).setScale(4.0).setDepth(1502);
+                const agentSp = game.add.image(da.x, da.y - 10, charKey).setOrigin(0.5, 1).setScale(2.8).setDepth(1502);
                 agentSp.setInteractive({ useHandCursor: true });
                 agentSp.on('pointerdown', () => {
                     if (typeof openDeskView === 'function') openDeskView(da.id, da.name, 'idle', '');
@@ -4636,7 +4644,7 @@ function toggleBrokerPanel() {
                     window.starWorking.anims.stop();
                 }
 
-                star.setVisible(true);
+                star.setVisible(false);
                 star.setScale(IDLE_STAR_SCALE);
                 star.anims.play('star_idle', true);
                 star.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
@@ -4792,7 +4800,7 @@ function toggleBrokerPanel() {
                                     window.starWorking.setVisible(false);
                                     window.starWorking.anims.stop();
                                 }
-                                star.setVisible(true);
+                                star.setVisible(false);
                                 star.setScale(IDLE_STAR_SCALE);
                                 star.anims.play('star_idle', true);
                                 star.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
@@ -4820,7 +4828,7 @@ function toggleBrokerPanel() {
                                 window.starWorking.setVisible(false);
                                 window.starWorking.anims.stop();
                             }
-                            star.setVisible(true);
+                            star.setVisible(false);
                             star.setScale(IDLE_STAR_SCALE);
                             star.anims.play('star_idle', true);
                             star.setPosition(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y);
@@ -4847,7 +4855,7 @@ function toggleBrokerPanel() {
             if (!isMoving && currentState !== 'idle' && pendingDesiredState === null && (time - lastWanderAt) > 3500) {
                 targetX = baseTarget.x + (Math.random() - 0.5) * 60;
                 targetY = baseTarget.y + (Math.random() - 0.5) * 40;
-                star.setVisible(true);
+                star.setVisible(false);
                 star.anims.play('star_idle', true);
                 isMoving = true;
                 lastWanderAt = time;
