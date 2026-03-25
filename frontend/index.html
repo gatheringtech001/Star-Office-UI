@@ -4131,9 +4131,11 @@ function toggleBrokerPanel() {
             const updateZoom = () => {
                 const w = this.scale.width;
                 const h = this.scale.height;
-                // Zoom tight on office area only - Pin哥 requested 3.5
-                cam.setZoom(3.5);
-                cam.centerOn(1100, 780);
+                // Zoom tight on office area only
+                // agents y: 436(names)~870(yang bottom), x: 960~1220
+                // visible span needed: ~300w x ~500h
+                cam.setZoom(Math.min(w / 300, h / 480));
+                cam.centerOn(1090, 650);
             };
             updateZoom();
             this.scale.on('resize', updateZoom);
