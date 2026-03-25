@@ -4407,14 +4407,11 @@ function toggleBrokerPanel() {
             // 记录初始是否已手动平移（避免 resize 时把用户拖好的位置重置）
             let hasManuallyPanned = false;
             function applyMobileCameraFit() {
-                // 所有设备都需要 zoom fit
                 const h = Math.max(1, camera.height);
                 const w = Math.max(1, camera.width);
-
-                const MAP_W = 2560, MAP_H = 720;
-                const zoom = Math.min(w / MAP_W, h / MAP_H) * 0.95;
+                const zoom = Math.min(w / 2560, h / 720) * 0.95;
                 camera.setZoom(zoom);
-                camera.centerOn(MAP_W / 2, MAP_H / 2);
+                camera.centerOn(1280, 360);
             }
             applyMobileCameraFit();
 
