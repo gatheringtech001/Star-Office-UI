@@ -4125,16 +4125,16 @@ function toggleBrokerPanel() {
                 window._deskAgentSprites[da.id] = { sprite: agentSprite, nameLabel, stateLabel };
             });
 
-            // Camera zoom to office area (v14f: tighter zoom on work area)
+            // Camera zoom to office area (v14h: show all 7 agents)
             const cam = this.cameras.main;
             cam.setBounds(0, 0, 1280, 960);
             const updateZoom = () => {
                 const w = this.scale.width;
                 const h = this.scale.height;
-                // Focus on office area ~400x500 region
-                const officeW = 500, officeH = 550;
-                cam.setZoom(Math.min(w / officeW, h / officeH) * 0.9);
-                cam.centerOn(1060, 650);
+                // Office area spans ~350px wide (x:930-1250), ~450px tall (y:430-880)
+                const officeW = 600, officeH = 600;
+                cam.setZoom(Math.min(w / officeW, h / officeH) * 0.88);
+                cam.centerOn(1080, 660);
             };
             updateZoom();
             this.scale.on('resize', updateZoom);
