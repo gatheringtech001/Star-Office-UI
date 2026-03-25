@@ -1546,11 +1546,11 @@
 
         const config = {
             type: Phaser.AUTO,
-            width: 2560,
-            height: 720,
+            width: 1280,
+            height: 960,
             parent: 'game-container',
             pixelArt: true,
-            backgroundColor: '#5e4a34',
+            backgroundColor: '#282420',
             scale: {
                 mode: Phaser.Scale.RESIZE,
                 autoCenter: Phaser.Scale.CENTER_BOTH
@@ -4038,631 +4038,110 @@ function toggleBrokerPanel() {
             loadingText = document.getElementById('loading-text');
             loadingProgressContainer = document.getElementById('loading-progress-container');
 
-            // 设置资源总数（全部首屏加载：装饰也第一时间出现）
-            totalAssets = 15;
+            totalAssets = 6;
             loadedAssets = 0;
 
-            // 加载进度监听
-            this.load.on('filecomplete', () => {
-                updateLoadingProgress();
-            });
+            this.load.on('filecomplete', () => { updateLoadingProgress(); });
+            this.load.on('complete', () => { hideLoadingOverlay(); });
 
-            this.load.on('complete', () => {
-                hideLoadingOverlay();
-            });
+            // === v13: 原版 SkyOffice tilemap 背景 + 角色坐姿 ===
+            this.load.image('office_bg', 'static/tilemap/office_map.webp?v={{VERSION_TIMESTAMP}}');
 
-            // cache-busting to avoid stale background on client/CDN
-            // use smaller/new map version provided by user
-            this.load.image('office_bg', 'static/office_bg_small.webp?v={{VERSION_TIMESTAMP}}');
-            this.load.spritesheet('star_idle', 'static/star-idle-v5.png?v={{VERSION_TIMESTAMP}}', { frameWidth: 256, frameHeight: 256 });
+            // 角色坐姿 sprite（从原版 atlas 裁剪的单帧 32x48）
+            this.load.image('char_adam_sit', 'static/char_adam_sit.png?v={{VERSION_TIMESTAMP}}');
+            this.load.image('char_ash_sit', 'static/char_ash_sit.png?v={{VERSION_TIMESTAMP}}');
+            this.load.image('char_lucy_sit', 'static/char_lucy_sit.png?v={{VERSION_TIMESTAMP}}');
+            this.load.image('char_nancy_sit', 'static/char_nancy_sit.png?v={{VERSION_TIMESTAMP}}');
 
-            // Furniture
-            this.load.image('sofa_idle', 'static/sofa-idle-v3.png?v={{VERSION_TIMESTAMP}}');
-            this.load.image('sofa_shadow', 'static/sofa-shadow-v1.png?v={{VERSION_TIMESTAMP}}');
-
-            // Decor
-            this.load.spritesheet('plants', 'static/plants-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 160, frameHeight: 160 });
-            this.load.spritesheet('posters', 'static/posters-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 160, frameHeight: 160 });
-            this.load.spritesheet('coffee_machine', 'static/coffee-machine-v3-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 230, frameHeight: 230 });
-            this.load.image('coffee_machine_shadow', 'static/coffee-machine-shadow-v1.png?v={{VERSION_TIMESTAMP}}');
-            this.load.spritesheet('serverroom', 'static/serverroom-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 180, frameHeight: 251 });
-
-            // Error / bug animation: 180x180, 96 frames (repacked grid)
-            this.load.spritesheet('error_bug', 'static/error-bug-spritesheet-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 220, frameHeight: 220 });
-
-            // 运行时 Gemini 配置（用于搬家/中介生图）
+            // 运行时 Gemini 配置
             this.geminiConfig = { hasKey: false, model: 'gemini-3.1-flash-image-preview' };
 
-            // Cat spritesheet: 160x160, 4x4=16 cats
-            this.load.spritesheet('cats', 'static/cats-spritesheet.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 160, frameHeight: 160 });
 
-            // Desk
-            // Star working animation: repacked to grid to avoid WebGL max texture size limits
-            // NOTE: prefer WebP for size, PNG fallback
-            // 动态替换后按最新素材识别：当前 writing 素材为 300x300 单帧
-            this.load.spritesheet('star_working', 'static/star-working-spritesheet-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 300, frameHeight: 300 });
-
-            // Sync state animation (256x256, 多帧): 非同步显示首帧，同步从第2帧循环
-            this.load.spritesheet('sync_anim', 'static/sync-animation-v3-grid.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 256, frameHeight: 256 });
-
-            // Memo background image
-            // memo 底图固定走 png，避免某些端 webp 透明通道异常导致"底图丢失"
-            this.load.image('memo_bg', 'static/memo-bg.webp?v={{VERSION_TIMESTAMP}}');
-            // Desk v2 (webp only)
-            this.load.image('desk_v2', 'static/desk-v3.webp?v={{VERSION_TIMESTAMP}}');
-            // Flower spritesheet (65x65, 16 frames)
-            this.load.spritesheet('flowers', 'static/flowers-bloom-v2.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: FLOWERS_FRAME_W, frameHeight: FLOWERS_FRAME_H });
-
-            // Guest/Demo agent sprites
-            this.load.spritesheet('guest_anim_1', 'static/guest_anim_1.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-            this.load.spritesheet('guest_anim_2', 'static/guest_anim_2.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-            this.load.spritesheet('guest_anim_3', 'static/guest_anim_3.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-            this.load.spritesheet('guest_anim_4', 'static/guest_anim_4.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-            this.load.spritesheet('guest_anim_5', 'static/guest_anim_5.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-            this.load.spritesheet('guest_anim_6', 'static/guest_anim_6.webp?v={{VERSION_TIMESTAMP}}', { frameWidth: 32, frameHeight: 32 });
-
-            // Guest role sprites (idle poses, 64x64 per frame, 2 frames)
-            for (let i = 1; i <= 6; i++) {
-                this.load.spritesheet('guest_role_' + i, 'static/guest_role_' + i + '.png?v={{VERSION_TIMESTAMP}}', { frameWidth: 64, frameHeight: 64 });
-            }
         }
 
         function create() {
             game = this;
             hideGameSkeleton();
-            officeBgSprite = this.add.image(800, 400, 'office_bg');
 
-            // Place furniture: Sofa
-            // NOTE: coordinates are interpreted as the TOP-LEFT corner of the sprite
-            const sofaShadow = this.add.image(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y, 'sofa_shadow').setOrigin(0.5).setScale(2);
-            sofaShadow.setDepth(9);
-            sofa = this.add.sprite(IDLE_SOFA_ANCHOR.x, IDLE_SOFA_ANCHOR.y, 'sofa_idle').setOrigin(0.5).setScale(2);
-            sofa.setDepth(10);
-            areas = {
-                door: { x: 640, y: 550 }, // 墙的门（偏下 1/3 位置）
-                writing: { x: 320, y: 360 }, // 左 1/3 中间（办公桌）
-                researching: { x: 320, y: 360 }, // 左 1/3 中间（研究也在办公区
-                error: { x: 1066, y: 180 }, // 右 1/3 上 1/2（服务器区
-                breakroom: { x: IDLE_SOFA_ANCHOR.x, y: IDLE_SOFA_ANCHOR.y } // 与 sofa-idle-v3 同中心锚点
+            // === v13: 原版 tilemap 背景 ===
+            officeBgSprite = this.add.image(640, 480, 'office_bg');
+            officeBgSprite.setDepth(0);
+
+            // === 7 个 agent 固定工位（坐在原版地图的办公区椅子上）===
+            const DESK_AGENTS = [
+                { id: 'sky',      name: 'Sky',   tag: '全栈', char: 'adam',  ox: 1088, oy: 480, dir: 'down' },
+                { id: 'manager',  name: 'K哥',   tag: '监管', char: 'ash',   ox: 1184, oy: 480, dir: 'down' },
+                { id: 'cto',      name: 'Pin哥', tag: '调度', char: 'lucy',  ox: 1088, oy: 576, dir: 'up' },
+                { id: 'devops',   name: 'Max',   tag: '运维', char: 'nancy', ox: 1184, oy: 576, dir: 'up' },
+                { id: 'backend',  name: '波哥',  tag: '后端', char: 'nancy', ox: 992,  oy: 736, dir: 'down' },
+                { id: 'frontend', name: 'Jr',    tag: '前端', char: 'lucy',  ox: 1088, oy: 736, dir: 'down' },
+                { id: 'qa',       name: 'Yang',  tag: 'QA',   char: 'adam',  ox: 1184, oy: 736, dir: 'down' },
+            ];
+
+            window._deskAgentSprites = {};
+            DESK_AGENTS.forEach(da => {
+                const charKey = 'char_' + da.char + '_sit';
+                const cx = da.ox + 16;
+                const charY = da.oy - 44; // center of character on chair
+
+                const agentSprite = this.add.image(cx, charY, charKey)
+                    .setOrigin(0.5, 0.5)
+                    .setDepth(100);
+                agentSprite.setInteractive({ useHandCursor: true });
+                agentSprite.on('pointerdown', () => {
+                    if (typeof openDeskView === 'function') {
+                        openDeskView(da.id, da.name, 'idle', '');
+                    }
+                });
+
+                const nameLabel = this.add.text(cx, charY - 32, da.name + ' [' + da.tag + ']', {
+                    fontFamily: 'ArkPixel, monospace',
+                    fontSize: '10px',
+                    fill: '#ffffff',
+                    stroke: '#000000',
+                    strokeThickness: 2,
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    padding: { x: 3, y: 1 }
+                }).setOrigin(0.5).setDepth(110);
+
+                const stateLabel = this.add.text(cx, charY + 30, '', {
+                    fontFamily: 'ArkPixel, monospace',
+                    fontSize: '9px',
+                    fill: '#22cc55',
+                    stroke: '#000000',
+                    strokeThickness: 2,
+                }).setOrigin(0.5).setDepth(110);
+
+                window._deskAgentSprites[da.id] = { sprite: agentSprite, nameLabel, stateLabel };
+            });
+
+            // Camera zoom to fit
+            const cam = this.cameras.main;
+            cam.setBounds(0, 0, 1280, 960);
+            const updateZoom = () => {
+                const w = this.scale.width;
+                const h = this.scale.height;
+                cam.setZoom(Math.min(w / 1280, h / 960));
             };
+            updateZoom();
+            this.scale.on('resize', updateZoom);
 
-            // 创建 Star 角色待命动画（每次先移除旧定义，确保不复用历史动画）
-            const starIdleFrameMax = Math.max(0, (this.textures.get('star_idle')?.frameTotal || 1) - 1);
-            if (this.anims.exists('star_idle')) {
-                this.anims.remove('star_idle');
-            }
-            this.anims.create({
-                key: 'star_idle',
-                frames: this.anims.generateFrameNumbers('star_idle', { start: 0, end: starIdleFrameMax }),
-                frameRate: 12,
-                repeat: -1
-            });
-
-
-            // 创建 6 个访客角色的循环 idle 动画（8帧循环）
-            for (let i = 1; i <= 6; i++) {
-                this.anims.create({
-                    key: `guest_anim_${i}_idle`,
-                    frames: this.anims.generateFrameNumbers(`guest_anim_${i}`, { start: 0, end: 7 }),
-                    frameRate: 8,
-                    repeat: -1
-                });
-            }
-
-            star = game.physics.add.sprite(areas.breakroom.x, areas.breakroom.y, 'star_idle');
-            star.setOrigin(0.5);
-            star.setScale(IDLE_STAR_SCALE * 2);
-            star.setAlpha(0);
-            star.setDepth(-1);
-            // 隐藏原版 Star 主角，由 DESK_AGENTS 固定工位替代
-            star.setVisible(false);
-            star.setActive(false);
-            star.anims.play('star_idle', true);
-
-            // Sofa stays static when idle (no longer the main idle animation)
-            sofa.anims.stop();
-            sofa.setTexture('sofa_idle');
-
-            // 加像素风小牌匾：海辛小龙虾的办公室
-            const plaqueX = config.width / 2;
-            const plaqueY = config.height - 36;
-            const plaqueBg = game.add.rectangle(plaqueX, plaqueY, 420, 44, 0x5d4037);
-            plaqueBg.setStrokeStyle(3, 0x3e2723);
-            const plaqueText = game.add.text(plaqueX, plaqueY, t('officeTitle'), {
-                fontFamily: 'ArkPixel, monospace',
-                fontSize: '24px',
-                fill: '#ffd700',
-                fontWeight: '900',
-                fontStyle: 'bold',
-                stroke: '#000',
-                strokeThickness: 3,
-                wordWrap: { width: 400 },
-                align: 'center'
-            }).setOrigin(0.5);
-            // 牌匾两边加个小装饰（跟随牌匾居中）
-            game.add.text(plaqueX - 190, plaqueY, '⭐', { fontFamily: 'ArkPixel, monospace', fontSize: '20px' }).setOrigin(0.5);
-            game.add.text(plaqueX + 190, plaqueY, '⭐', { fontFamily: 'ArkPixel, monospace', fontSize: '20px' }).setOrigin(0.5);
-            window.officePlaqueText = plaqueText;
-
-            // Random plant at (565,178) (frame 0-15, 160x160 each)
-            const plantFrameCount = 16;
-            const randomPlantFrame = Math.floor(Math.random() * plantFrameCount);
-            const plant = game.add.sprite(1130, 356, 'plants', randomPlantFrame).setOrigin(0.5).setScale(2);
-            plant.setDepth(5);
-            plant.setInteractive({ useHandCursor: true });
-            // Expose to global for click handler
-            window.plantSprite = plant;
-            window.plantFrameCount = plantFrameCount;
-
-            plant.on('pointerdown', () => {
-                const next = Math.floor(Math.random() * window.plantFrameCount);
-                window.plantSprite.setFrame(next);
-            });
-
-            // Random plant at (230,185) (frame 0-15, 160x160 each)
-            const plant2Frame = Math.floor(Math.random() * plantFrameCount);
-            const plant2 = game.add.sprite(460, 370, 'plants', plant2Frame).setOrigin(0.5).setScale(2);
-            plant2.setDepth(5);
-            plant2.setInteractive({ useHandCursor: true });
-            // Expose to global for click handler
-            window.plantSprite2 = plant2;
-
-            plant2.on('pointerdown', () => {
-                const next = Math.floor(Math.random() * window.plantFrameCount);
-                window.plantSprite2.setFrame(next);
-            });
-
-            // Random plant at (977,496) (frame 0-15, 160x160 each)
-            const plant3Frame = Math.floor(Math.random() * plantFrameCount);
-            const plant3 = game.add.sprite(1954, 992, 'plants', plant3Frame).setOrigin(0.5).setScale(2);
-            plant3.setDepth(5);
-            plant3.setInteractive({ useHandCursor: true });
-            // Expose to global for click handler
-            window.plantSprite3 = plant3;
-
-            plant3.on('pointerdown', () => {
-                const next = Math.floor(Math.random() * window.plantFrameCount);
-                window.plantSprite3.setFrame(next);
-            });
-
-            // Random poster at (252,66) (random frame from spritesheet)
-            const postersFrameCount = (this.textures.get('posters')?.frameTotal || 1) - 1;
-            const randomPosterFrame = Math.floor(Math.random() * Math.max(1, postersFrameCount));
-            const poster = game.add.sprite(504, 132, 'posters', randomPosterFrame).setOrigin(0.5).setScale(2);
-            poster.setDepth(4);
-            poster.setInteractive({ useHandCursor: true });
-            // Expose to global for click handler
-            window.posterSprite = poster;
-            window.posterFrameCount = postersFrameCount;
-
-            poster.on('pointerdown', () => {
-                const next = Math.floor(Math.random() * window.posterFrameCount);
-                window.posterSprite.setFrame(next);
-            });
-
-            // Random cat at (94,557)
-            const catsFrameCount = (this.textures.get('cats')?.frameTotal || 1) - 1;
-            const randomCatFrame = Math.floor(Math.random() * Math.max(1, catsFrameCount));
-            const cat = game.add.sprite(188, 1114, 'cats', randomCatFrame).setOrigin(0.5).setScale(2);
-            cat.setDepth(2000); // top layer
-            cat.setInteractive({ useHandCursor: true });
-            // Expose to global for click handler
-            window.catSprite = cat;
-            window.catsFrameCount = catsFrameCount;
-            cat.on('pointerdown', () => {
-                const next = Math.floor(Math.random() * window.catsFrameCount);
-                window.catSprite.setFrame(next);
-            });
-
-            // Coffee machine at (659,397) - animated sprite + shadow
-            const coffeeMachineShadow = this.add.image(1318, 794, 'coffee_machine_shadow').setOrigin(0.5).setScale(2);
-            coffeeMachineShadow.setDepth(98);
-            const coffeeFrameMax = Math.max(0, (this.textures.get('coffee_machine')?.frameTotal || 1) - 2);
-            if (this.anims.exists('coffee_machine')) {
-                this.anims.remove('coffee_machine');
-            }
-            this.anims.create({
-                key: 'coffee_machine',
-                frames: this.anims.generateFrameNumbers('coffee_machine', { start: 0, end: coffeeFrameMax }),
-                frameRate: 12.5,
-                repeat: -1
-            });
-            const coffeeMachine = this.add.sprite(1318, 794, 'coffee_machine').setOrigin(0.5).setScale(2);
-            coffeeMachine.setDepth(99);
-            coffeeMachine.anims.play('coffee_machine', true);
-
-            // Server room animation
-            const serverFrameMax = Math.max(0, (this.textures.get('serverroom')?.frameTotal || 1) - 2);
-            this.anims.create({
-                key: 'serverroom_on',
-                frames: this.anims.generateFrameNumbers('serverroom', { start: 0, end: serverFrameMax }),
-                frameRate: 6,
-                repeat: -1
-            });
-            serverroom = this.add.sprite(2042, 284, 'serverroom', 0).setOrigin(0.5).setScale(2);
-            serverroom.setDepth(2);
-            // 默认 idle: 静止第0帧
-            serverroom.anims.stop();
-            serverroom.setFrame(0);
-
-            // Desk at (218,417) (v2)
-            const desk = this.add.image(436, 834, 'desk_v2').setScale(2).setOrigin(0.5);
-            desk.setDepth(1001);  // desk above starWorking
-
-            // Random flower pot at (310,390), default scale 0.8 (top layer)
-            const flowerFrameCount = Math.max(1, FLOWERS_FRAME_COLS * FLOWERS_FRAME_ROWS); // 动态帧数
-            const randomFlowerFrame = Math.floor(Math.random() * flowerFrameCount);
-            const flower = this.add.sprite(620, 780, 'flowers', randomFlowerFrame).setOrigin(0.5).setScale(2);
-            flower.setScale(0.8);
-            flower.setDepth(1100); // highest among desk/starWorking
-            flower.setInteractive({ useHandCursor: true });
-            window.flowerSprite = flower;
-            window.flowerFrameCount = flowerFrameCount;
-            flower.on('pointerdown', () => {
-                const next = Math.floor(Math.random() * window.flowerFrameCount);
-                window.flowerSprite.setFrame(next);
-            });
-
-            // Star working at desk (217,333)
-            this.anims.create({
-                key: 'star_working',
-                // 38 帧（0~37），避免沿用旧 192 帧导致疯狂闪烁
-                frames: this.anims.generateFrameNumbers('star_working', { start: 0, end: 37 }),
-                frameRate: 12,
-                repeat: -1
-            });
-
-            // Error / bug animation (96 frames)
-            this.anims.create({
-                key: 'error_bug',
-                frames: this.anims.generateFrameNumbers('error_bug', { start: 0, end: 71 }),
-                frameRate: 12,
-                repeat: -1
-            });
-
-            // Error bug character (moves between two points when state=error)
-            const errorBug = this.add.sprite(2014, 442, 'error_bug', 0).setOrigin(0.5).setScale(2);
-            errorBug.setDepth(50); // above serverroom, below desk/bubbles
-            errorBug.setVisible(false);
-            errorBug.setScale(0.9); // shrink 10%
-            errorBug.anims.play('error_bug', true);
-            window.errorBug = errorBug;
-            window.errorBugDir = 1; // 1 -> to right, -1 -> to left
-            const starWorking = this.add.sprite(434, 686, 'star_working', 0).setOrigin(0.5).setScale(2);
-            starWorking.setVisible(false);
-            starWorking.setScale(0.9);
-            starWorking.setDepth(900);  // starWorking under desk so desk partially covers it
-            // Store reference to starWorking for state logic
-            window.starWorking = starWorking;
-
-            // Sync animation sprite at (1157,592)
-            const syncFrameTotal = Number(this.textures.get('sync_anim')?.frameTotal || 0);
-            const syncFrameStart = 1;
-            const syncFrameEnd = Math.max(0, syncFrameTotal - 2);
-            // 仅在确实存在可播放帧（>=1）时才创建同步动画，避免单帧素材触发播放异常
-            syncAnimPlayable = syncFrameTotal >= 3 && syncFrameEnd >= syncFrameStart;
-            if (this.anims.exists('sync_anim')) {
-                this.anims.remove('sync_anim');
-            }
-            if (syncAnimPlayable) {
-            this.anims.create({
-                key: 'sync_anim',
-                    frames: this.anims.generateFrameNumbers('sync_anim', { start: syncFrameStart, end: syncFrameEnd }),
-                frameRate: 12,
-                repeat: -1
-            });
-            }
-            syncAnimSprite = this.add.sprite(2314, 1184, 'sync_anim', 0).setOrigin(0.5).setScale(2);
-            syncAnimSprite.setDepth(40);
-            // default show first frame only
-            syncAnimSprite.anims.stop();
-            syncAnimSprite.setFrame(0);
-
-            // Debug: expose star sprite too (for path calibration / visuals)
-            window.starSprite = star;
-
-            statusText = document.getElementById('status-text');
-            placeOverlayAndStatusAtCanvasBottomLeft();
-            window.addEventListener('resize', placeOverlayAndStatusAtCanvasBottomLeft);
-            window.addEventListener('scroll', placeOverlayAndStatusAtCanvasBottomLeft, { passive: true });
-            coordsOverlay = document.getElementById('coords-overlay');
-            coordsDisplay = document.getElementById('coords-display');
-            coordsToggle = document.getElementById('coords-toggle');
-
-            // guest agent 将由 /agents 动态拉取并渲染到右侧访客列表
-            coordsToggle.addEventListener('click', () => {
-                showCoords = !showCoords;
-                coordsOverlay.style.display = showCoords ? 'block' : 'none';
-                coordsToggle.textContent = showCoords ? t('hideCoords') : t('showCoords');
-                coordsToggle.style.background = showCoords ? '#e94560' : '#333';
-            });
-
-            // 允许手机端"拖动/滑动"来移动视野（本质：移动 Phaser Camera）
-            // iPhone 等触屏设备默认开启；桌面端默认关闭（可手动开）。
-            const panToggle = document.getElementById('pan-toggle');
-            const isTouchDevice = IS_TOUCH_DEVICE;
-            let panEnabled = false;
-            let isPanning = false;
-            let panStart = null; // {x,y,sx,sy}
-            const camera = game.cameras.main;
-
-            const MAP_W = config.width;
-            const MAP_H = config.height;
-            function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-            function maxScrollX() {
-                const viewportW = camera.width / Math.max(0.01, camera.zoom);
-                return Math.max(0, MAP_W - viewportW);
-            }
-            function maxScrollY() {
-                const viewportH = camera.height / Math.max(0.01, camera.zoom);
-                return Math.max(0, MAP_H - viewportH);
-            }
-            function clampCameraScroll() {
-                camera.scrollX = clamp(camera.scrollX, 0, maxScrollX());
-                camera.scrollY = clamp(camera.scrollY, 0, maxScrollY());
-            }
-
-            // 手机上：锁定"办公室画布高度 = 2/3 区域高度"，
-            // 让世界坐标在竖向恰好看满（不需要上下拖），只保留横向拖动浏览左右。
-            // 记录初始是否已手动平移（避免 resize 时把用户拖好的位置重置）
-            let hasManuallyPanned = false;
-            function applyMobileCameraFit() {
-                const h = Math.max(1, camera.height);
-                const w = Math.max(1, camera.width);
-                const zoom = Math.min(w / 2560, h / 720) * 0.95;
-                camera.setZoom(zoom);
-                camera.centerOn(1280, 360);
-            }
-            applyMobileCameraFit();
-
-            // 窗口 resize 时重算 zoom
-            if (game.scale) {
-                game.scale.on('resize', () => {
-                    applyMobileCameraFit();
-                    placeOverlayAndStatusAtCanvasBottomLeft();
-                });
-            }
-
-            camera.setBounds(0, 0, 2560, 720);
-            clampCameraScroll();
-
-            function setPanEnabled(on) {
-                panEnabled = on;
-                if (panToggle) {
-                    panToggle.dataset.on = on ? '1' : '0';
-                    panToggle.textContent = on ? t('lockView') : t('moveView');
-                    panToggle.style.background = on ? '#e94560' : '#333';
-                }
-                game.input.setDefaultCursor(on ? 'grab' : 'default');
-                if (isTouchDevice && statusText) {
-                    const info = on ? '视野拖动已开启（可左右拖动画布）' : '视野拖动已关闭（点击左上角"移动视野"可开启）';
-                    statusText.textContent = `状态：[${(STATES[currentState] && STATES[currentState].name) || '待命'}] ${info}`;
-                }
-            }
-
-            if (panToggle) {
-                panToggle.addEventListener('click', () => setPanEnabled(!panEnabled));
-            }
-
-            // 手机端默认关闭拖动画面：由左上角"移动视野"开关显式开启
-            if (isTouchDevice) {
-                setPanEnabled(false);
-            }
-
-            // iOS/Safari 手势策略：
-            // - 保留垂直滚动（让页面能下滑看三个面板）
-            // - 水平方向拖动时才阻止默认行为，并转为 camera 横向平移
-            // 说明：iOS 对 pointer + touch-action 支持存在机型差异，所以这里加一套原生 touch 兜底。
-            const canvasEl = game.canvas;
-            let touchPan = null; // {x,y,sx,sy,lock:'x'|'y'|null}
-            if (canvasEl) {
-                // 手机端允许页面自然滚动，避免"不能滑动"
-                canvasEl.style.touchAction = 'auto';
-
-                canvasEl.addEventListener('touchstart', (e) => {
-                    if (!panEnabled || e.touches.length !== 1) return;
-                    const t = e.touches[0];
-                    touchPan = { x: t.clientX, y: t.clientY, sx: camera.scrollX, sy: camera.scrollY, lock: null };
-                }, { passive: true });
-
-                canvasEl.addEventListener('touchmove', (e) => {
-                    if (!panEnabled || !touchPan || e.touches.length !== 1) return;
-                    const t = e.touches[0];
-                    const dx = t.clientX - touchPan.x;
-                    const dy = t.clientY - touchPan.y;
-
-                    if (!touchPan.lock) {
-                        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
-                        touchPan.lock = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
-                    }
-
-                    if (touchPan.lock === 'x') {
-                        // 横向拖动交给办公室视野；阻止浏览器默认滚动
-                        e.preventDefault();
-                        hasManuallyPanned = true;
-                        camera.scrollX = clamp(touchPan.sx - dx, 0, maxScrollX());
-                    }
-                    // lock==='y' 时不阻止默认，交给页面纵向滚动
-                }, { passive: false });
-
-                const clearTouchPan = () => { touchPan = null; };
-                canvasEl.addEventListener('touchend', clearTouchPan, { passive: true });
-                canvasEl.addEventListener('touchcancel', clearTouchPan, { passive: true });
-            }
-
-            game.input.on('pointerdown', (pointer) => {
-                if (!panEnabled) return;
-                isPanning = true;
-                panStart = { x: pointer.x, y: pointer.y, sx: camera.scrollX, sy: camera.scrollY };
-                game.input.setDefaultCursor('grabbing');
-            });
-
-            game.input.on('pointerup', () => {
-                if (!panEnabled) return;
-                isPanning = false;
-                panStart = null;
-                game.input.setDefaultCursor('grab');
-            });
-
-            game.input.on('pointermove', (pointer) => {
-                if (!panEnabled || !isPanning || !panStart) return;
-                const dx = pointer.x - panStart.x;
-                const dy = pointer.y - panStart.y;
-
-                // 手机端优先"横向拖动看办公室"，纵向手势留给页面滚动看下方面板。
-                if (isTouchDevice && Math.abs(dy) > Math.abs(dx)) {
-                    return;
-                }
-
-                // 手指向右拖，视野跟着向右看：camera scroll 向左减小（反向）
-                const newX = panStart.sx - dx;
-                hasManuallyPanned = true;
-                camera.scrollX = clamp(newX, 0, maxScrollX());
-
-                // 桌面端保留自由二维拖动
-                if (!isTouchDevice) {
-                    const newY = panStart.sy - dy;
-                    camera.scrollY = clamp(newY, 0, maxScrollY());
-                }
-            });
-
-            // Mouse move handler for coordinate display
-            game.input.on('pointermove', (pointer) => {
-                if (!showCoords) return;
-                // Clamp to map size (0..width-1 / 0..height-1)
-                const x = Math.max(0, Math.min(config.width - 1, Math.round(pointer.x)));
-                const y = Math.max(0, Math.min(config.height - 1, Math.round(pointer.y)));
-                coordsDisplay.textContent = `${x}, ${y}`;
-                // Position overlay next to mouse
-                coordsOverlay.style.left = (pointer.x + 18) + 'px';
-                coordsOverlay.style.top = (pointer.y + 18) + 'px';
-            });
-
-            // 加载昨日 memo
-            loadMemo();
+            // 牌匾
+            this.add.rectangle(640, 930, 300, 30, 0x5d4037).setStrokeStyle(2, 0x8b6914).setDepth(200);
+            this.add.text(640, 930, '\u{1f99e} 海辛小龙虾工作室', {
+                fontFamily: 'ArkPixel, monospace', fontSize: '12px', fill: '#f5deb3',
+                stroke: '#3e2723', strokeThickness: 2
+            }).setOrigin(0.5).setDepth(201);
 
             fetchStatus();
             fetchGuestAgents();
 
-            // === 7 个 agent 固定工位（Phaser 画布内直接渲染）===
-            const DESK_AGENTS = [
-                // 办公区 (520-1580), 填满 800 高度
-                // 上排 4 人 (y=200) — 间距 350px, Max 修复间距
-                { id: 'sky',      name: 'Sky 🌤️',  role: 1, x: 600,  y: 200 },
-                { id: 'manager',  name: 'K哥 📋',   role: 2, x: 850,  y: 200 },
-                { id: 'cto',      name: 'Pin哥 📌', role: 3, x: 1200, y: 200 },
-                { id: 'devops',   name: 'Max 🔧',   role: 4, x: 1550, y: 200 },
-                // 下排 3 人 (y=550) — 间距 400px
-                { id: 'backend',  name: '波哥 🌊',  role: 5, x: 650,  y: 550 },
-                { id: 'frontend', name: 'Jr 🎨',    role: 6, x: 1050, y: 550 },
-                { id: 'qa',       name: 'Yang 🧪',  role: 1, x: 1450, y: 550 },
-            ];
-
-            // 创建 guest 动画 keys
-            for (let i = 1; i <= 6; i++) {
-                if (!this.anims.exists('guest_idle_' + i)) {
-                    this.anims.create({
-                        key: 'guest_idle_' + i,
-                        frames: this.anims.generateFrameNumbers('guest_role_' + i, { start: 0, end: 1 }),
-                        frameRate: 2, repeat: -1
-                    });
-                }
-                if (!this.anims.exists('guest_work_' + i)) {
-                    this.anims.create({
-                        key: 'guest_work_' + i,
-                        frames: this.anims.generateFrameNumbers('guest_anim_' + i, { start: 0, end: 1 }),
-                        frameRate: 4, repeat: -1
-                    });
-                }
-            }
-
-            window._deskAgentSprites = {};
-            DESK_AGENTS.forEach(da => {
-                // 桌子（原版 desk_v2 sprite，陛下认可的样式）
-                const deskSprite = game.add.image(da.x, da.y + 12, 'desk_v2').setOrigin(0.5).setScale(1.5).setDepth(1500);
-
-                // agent sprite（坐在桌前）— 使用 guest_anim 系列（32x32 帧，更精确）
-                const agentSprite = game.add.sprite(da.x, da.y, 'guest_role_' + da.role, 0).setOrigin(0.5).setScale(4.0).setDepth(1501);
-                // 不播放动画，使用静态帧 0
-                agentSprite.setInteractive({ useHandCursor: true });
-
-                const agentId = da.id;
-                const agentName = da.name;
-                agentSprite.on('pointerdown', () => {
-                    if (typeof openDeskView === 'function') {
-                        openDeskView(agentId, agentName, 'idle', '');
-                    }
-                });
-
-                // 名字标签
-                const nameLabel = game.add.text(da.x, da.y - 95, da.name, {
-                    fontFamily: 'ArkPixel, monospace',
-                    fontSize: '40px',
-                    fontStyle: 'bold',
-                    fill: '#ffffff',
-                    stroke: '#000000',
-                    strokeThickness: 6,
-                    backgroundColor: 'rgba(0,0,0,0.85)',
-                    padding: { x: 14, y: 7 }
-                }).setOrigin(0.5).setDepth(1510);
-
-                // 状态标签
-                const stateLabel = game.add.text(da.x, da.y + 75, '工作中', {
-                    fontFamily: 'ArkPixel, monospace',
-                    fontSize: '30px',
-                    fill: '#22cc55',
-                    stroke: '#000000',
-                    strokeThickness: 4,
-                }).setOrigin(0.5).setDepth(1510);
-
-                window._deskAgentSprites[da.id] = { sprite: agentSprite, nameLabel: nameLabel, stateLabel: stateLabel, role: da.role };
-            });
-
-            // 隐藏所有旧 Mountain Lodge sprite，只保留背景图和 DESK_AGENTS 工位
-            {
-                const keepSet = new Set();
-                Object.values(window._deskAgentSprites || {}).forEach(v => {
-                    if (v.sprite) keepSet.add(v.sprite);
-                    if (v.nameLabel) keepSet.add(v.nameLabel);
-                    if (v.stateLabel) keepSet.add(v.stateLabel);
-                });
-                const sc = game.scene.scenes[0];
-                sc.children.list.forEach(child => {
-                    if (!child || !child.texture) return;
-                    const key = child.texture.key;
-                    if (key === 'office_bg' || key === 'desk_v2') return;
-                    if (keepSet.has(child)) return;
-                    child.setVisible(false);
-                });
-            }
-
-            // Max 修复：定期清除旧 guest sprite 残留（depth 2600 区域）
-            // DESK_AGENTS 用 depth 1500-1510，旧 guest 用 2600-2601
-            const _deskKeepSet = new Set();
-            if (window._deskAgentSprites) {
-                Object.values(window._deskAgentSprites).forEach(da => {
-                    if (da.sprite) _deskKeepSet.add(da.sprite);
-                    if (da.nameLabel) _deskKeepSet.add(da.nameLabel);
-                    if (da.stateLabel) _deskKeepSet.add(da.stateLabel);
-                });
-            }
-            this.time.addEvent({
-                delay: 2000,
-                loop: true,
-                callback: () => {
-                    if (!game || !game.children) return;
-                    game.children.list.forEach(child => {
-                        if (child.depth >= 2500 && !_deskKeepSet.has(child)) {
-                            child.destroy();
-                        }
-                    });
-                }
-            });
-        }
 
         function update(time) {
             if (time - lastFetch > FETCH_INTERVAL) { fetchStatus(); lastFetch = time; }
             if (time - lastGuestAgentsFetch > GUEST_AGENTS_FETCH_INTERVAL) { fetchGuestAgents(); lastGuestAgentsFetch = time; }
+            // v13: 旧 sprite 逻辑全部跳过（serverroom/errorBug/syncAnim/star/moveStar 已移除）
+            return;
 
             // 兜底：非 idle 时确保机房动画在播，idle 时静止
             const effectiveStateForServer = pendingDesiredState || currentState;
