@@ -4649,7 +4649,10 @@ function toggleBrokerPanel() {
                   ${stateEmoji[state]||'🧑‍💻'} <strong>${name}</strong>
                   <span class="status-pill">${stateLabel[state]||state}</span>
                 </div>
-                <button class="back-btn" onclick="document.getElementById('desk-overlay').remove()">← 返回办公室</button>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <button class="back-btn" style="font-size:12px;padding:6px 16px" onclick="openWhiteboard()">📋 团队白板</button>
+                  <button class="back-btn" onclick="document.getElementById('desk-overlay').remove()">← 返回办公室</button>
+                </div>
               </div>
             </div>
           `;
@@ -4791,6 +4794,124 @@ function toggleBrokerPanel() {
             }
           } catch(e) {
             if (terminal) terminal.innerHTML += '<div class="line err">❌ 保存失败: ' + e.message + '</div>';
+          }
+        };
+
+        // F4: Team Whiteboard
+        window.openWhiteboard = async function() {
+          // Remove desk overlay if exists
+          const deskOv = document.getElementById('desk-overlay');
+          if (deskOv) deskOv.remove();
+
+          const overlay = document.createElement('div');
+          overlay.id = 'whiteboard-overlay';
+          overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(5,5,15,0.95);z-index:9999;display:flex;justify-content:center;align-items:center;backdrop-filter:blur(10px)';
+
+          overlay.innerHTML = `
+            <div style="width:90%;max-width:1000px;height:85vh;display:flex;flex-direction:column;background:rgba(11,12,16,0.98);border:1px solid rgba(0,255,170,0.2);border-radius:16px;overflow:hidden;box-shadow:0 0 60px rgba(0,255,170,0.1)">
+              <div style="padding:16px 24px;background:rgba(0,255,170,0.05);border-bottom:1px solid rgba(0,255,170,0.15);display:flex;justify-content:space-between;align-items:center">
+                <div style="color:#00ffaa;font-size:16px;font-weight:bold;letter-spacing:1px">📋 TEAM WHITEBOARD</div>
+                <div style="display:flex;gap:8px">
+                  <button id="wb-save-btn" class="back-btn" style="font-size:11px;padding:4px 14px;border-color:#22c55e;color:#22c55e" onclick="saveWhiteboard()">💾 保存</button>
+                  <button class="back-btn" style="font-size:11px;padding:4px 14px" onclick="document.getElementById('whiteboard-overlay').remove()">✕ 关闭</button>
+                </div>
+              </div>
+              <div style="flex:1;display:flex;overflow:hidden">
+                <div id="wb-sidebar" style="width:200px;border-right:1px solid rgba(255,255,255,0.08);padding:12px;overflow-y:auto">
+                  <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📌 笔记列表</div>
+                  <div id="wb-note-list" style="font-size:12px;color:#a0aec0">加载中...</div>
+                  <button class="back-btn" style="font-size:11px;padding:4px 10px;margin-top:12px;width:100%" onclick="createNote()">+ 新建笔记</button>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;padding:16px">
+                  <div id="wb-note-title" style="font-size:14px;color:#00ffaa;margin-bottom:8px;font-weight:bold">选择或新建一条笔记</div>
+                  <textarea id="wb-editor" style="flex:1;background:rgba(0,0,0,0.3);color:#c0cad8;border:1px solid rgba(0,255,170,0.15);border-radius:8px;padding:16px;font-family:monospace;font-size:13px;line-height:1.6;resize:none" placeholder="在这里写团队笔记、TODO、知识..."></textarea>
+                  <div id="wb-status" style="font-size:11px;color:#475569;margin-top:8px;text-align:right"></div>
+                </div>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(overlay);
+          overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+          loadWhiteboardNotes();
+        };
+
+        let currentNoteId = null;
+        const WB_API = 'agent-files/star'; // Use star agent as shared whiteboard storage
+
+        async function loadWhiteboardNotes() {
+          const listEl = document.getElementById('wb-note-list');
+          if (!listEl) return;
+          try {
+            const res = await fetch(WB_API);
+            const data = await res.json();
+            const files = (data.files || []).filter(f => f.name.startsWith('whiteboard/') || f.name === 'WHITEBOARD.md');
+            if (files.length === 0) {
+              listEl.innerHTML = '<div style="color:#475569;font-size:11px">暂无笔记</div>';
+              return;
+            }
+            listEl.innerHTML = files.map(f => {
+              const short = f.name.replace('whiteboard/', '').replace('.md', '');
+              return '<div style="padding:6px 8px;cursor:pointer;border-radius:4px;margin-bottom:4px;border-left:2px solid transparent;transition:all 0.2s" class="wb-note-item" onclick="loadNote(\'' + escHtml(f.name).replace(/'/g, "\\'") + '\')" onmouseover="this.style.background=\'rgba(0,255,170,0.05)\';this.style.borderLeftColor=\'#00ffaa\'" onmouseout="this.style.background=\'transparent\';this.style.borderLeftColor=\'transparent\'">' + escHtml(short) + '<div style="font-size:10px;color:#475569">' + timeAgo(f.modified) + '</div></div>';
+            }).join('');
+          } catch(e) {
+            listEl.innerHTML = '<div style="color:#ef4444">加载失败</div>';
+          }
+        }
+
+        window.loadNote = async function(path) {
+          currentNoteId = path;
+          const editor = document.getElementById('wb-editor');
+          const title = document.getElementById('wb-note-title');
+          const status = document.getElementById('wb-status');
+          if (!editor) return;
+          title.textContent = '📝 ' + path;
+          editor.value = '加载中...';
+          try {
+            const res = await fetch(WB_API + '?path=' + encodeURIComponent(path));
+            const data = await res.json();
+            editor.value = data.content || '';
+            status.textContent = (data.size || 0) + ' bytes · ' + timeAgo(data.modified || '');
+          } catch(e) {
+            editor.value = '❌ 加载失败: ' + e.message;
+          }
+        };
+
+        window.saveWhiteboard = async function() {
+          if (!currentNoteId) { alert('请先选择或新建一条笔记'); return; }
+          const editor = document.getElementById('wb-editor');
+          const status = document.getElementById('wb-status');
+          if (!editor) return;
+          try {
+            const res = await fetch(WB_API, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ path: currentNoteId, content: editor.value })
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            status.textContent = '✅ 已保存 · ' + new Date().toLocaleTimeString('zh-CN');
+            status.style.color = '#22c55e';
+            setTimeout(() => { status.style.color = '#475569'; }, 2000);
+          } catch(e) {
+            status.textContent = '❌ 保存失败: ' + e.message;
+            status.style.color = '#ef4444';
+          }
+        };
+
+        window.createNote = async function() {
+          const name = prompt('笔记名称（不含 .md 后缀）：');
+          if (!name || !name.trim()) return;
+          const path = 'whiteboard/' + name.trim() + '.md';
+          try {
+            await fetch(WB_API, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ path: path, content: '# ' + name.trim() + '\\n\\n' })
+            });
+            currentNoteId = path;
+            loadWhiteboardNotes();
+            loadNote(path);
+          } catch(e) {
+            alert('创建失败: ' + e.message);
           }
         };
 
