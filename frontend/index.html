@@ -4097,7 +4097,7 @@ function toggleBrokerPanel() {
                 const agentSprite = this.add.image(cx, charY, charKey)
                     .setOrigin(0.5, 0.5)
                     .setDepth(100);
-                agentSprite.setInteractive({ useHandCursor: true });
+                agentSprite.setInteractive({ useHandCursor: true, hitArea: new Phaser.Geom.Rectangle(-16, -24, 64, 72), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
                 agentSprite.on('pointerdown', () => {
                     if (typeof openDeskView === 'function') {
                         openDeskView(da.id, da.name, 'idle', '');
@@ -4113,6 +4113,10 @@ function toggleBrokerPanel() {
                     backgroundColor: 'rgba(0,0,0,0.8)',
                     padding: { x: 3, y: 1 }
                 }).setOrigin(0.5).setDepth(110);
+                nameLabel.setInteractive({ useHandCursor: true });
+                nameLabel.on('pointerdown', () => {
+                    if (typeof openDeskView === 'function') openDeskView(da.id, da.name, 'idle', '');
+                });
 
                 const stateLabel = this.add.text(cx, charY + 30, '', {
                     fontFamily: 'ArkPixel, monospace',
@@ -4635,7 +4639,7 @@ function toggleBrokerPanel() {
                     <div class="line cmd">$ lobster agent --id ${lobsterId} --status</div>
                     <div class="line info">状态: ${stateLabel[state]||state} ${stateEmoji[state]||''}</div>
                     <div class="line out">任务: ${detail || '暂无'}</div>
-                    <div class="line cmd">$ lobster sessions --agent ${lobsterId}</div>
+                    <div class="line cmd">$ lobster team --status</div>
                     <div class="line out" style="color:#475569">加载 session 列表中...<span class="cursor-blink">▌</span></div>
                   </div>
                 </div>
@@ -4813,7 +4817,7 @@ function toggleBrokerPanel() {
                 <div style="display:flex;gap:8px;align-items:center">
                   <span id="wb-status" style="font-size:11px;color:#475569"></span>
                   <button class="back-btn" style="font-size:11px;padding:4px 14px;border-color:#22c55e;color:#22c55e" onclick="saveWhiteboard()">💾 保存</button>
-                  <button class="back-btn" style="font-size:11px;padding:4px 14px" onclick="document.getElementById('whiteboard-overlay').remove()">✕ 关闭</button>
+                  <button class="back-btn" style="font-size:11px;padding:4px 14px" onclick="closeWhiteboard()">✕ 关闭</button>
                 </div>
               </div>
               <div style="flex:1;display:flex;flex-direction:column;padding:16px;overflow:hidden">
@@ -4834,6 +4838,11 @@ function toggleBrokerPanel() {
           } catch(e) {
             editor.value = '❌ 加载失败: ' + e.message;
           }
+        };
+
+        window.closeWhiteboard = function() {
+          const el = document.getElementById('whiteboard-overlay');
+          if (el) el.remove();
         };
 
         window.saveWhiteboard = async function() {
