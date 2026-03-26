@@ -4606,7 +4606,7 @@ function toggleBrokerPanel() {
               .session-meta{color:#64748b;font-size:12px;display:flex;gap:12px;align-items:center}
               .cursor-blink{animation:cursorBlink 1s infinite;background:#00ffaa;color:#000;padding:0 4px;margin-left:4px}
 
-              .desk-items{display:flex;flex-direction:column;gap:16px;width:130px;z-index:2;position:relative}
+              .desk-items{display:flex;flex-direction:column;gap:8px;width:200px;z-index:2;position:relative;max-height:400px;overflow-y:auto}
               .desk-item{background:rgba(20,24,32,0.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:12px;text-align:center;font-size:13px;cursor:pointer;transition:all 0.3s;box-shadow:0 10px 20px rgba(0,0,0,0.4)}
               .desk-item:hover{transform:translateY(-5px);border-color:rgba(0,255,170,0.3);box-shadow:0 15px 30px rgba(0,255,170,0.1)}
               .desk-item .emoji{font-size:32px;display:block;margin-bottom:6px;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.5))}
@@ -4639,11 +4639,9 @@ function toggleBrokerPanel() {
                     <div class="line out" style="color:#475569">加载 session 列表中...<span class="cursor-blink">▌</span></div>
                   </div>
                 </div>
-                <div class="desk-items">
-                  <div class="desk-item"><span class="emoji">☕</span>热咖啡</div>
-                  <div class="desk-item note"><span class="emoji">📌</span>Sprint Note</div>
-                  <div class="desk-item"><span class="emoji">🌱</span>盆栽</div>
-                  <div class="desk-item"><span class="emoji">🕐</span>${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</div>
+                <div class="desk-items" id="desk-files-panel">
+                  <div style="font-size:12px;color:#64748b;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">📂 Agent 文件</div>
+                  <div id="desk-file-list" style="font-size:12px;color:#a0aec0">加载中...</div>
                 </div>
               </div>
               <div class="desk-shelf">
@@ -4699,6 +4697,26 @@ function toggleBrokerPanel() {
               terminal.innerHTML += '<div class="line err">❌ API 连接失败: ' + e.message + '</div>';
             }
           }
+
+          // F3: Fetch agent files
+          try {
+            const fRes = await fetch('http://localhost:3200/api/agents/' + agentId + '/files');
+            const fData = await fRes.json();
+            const fileList = document.getElementById('desk-file-list');
+            if (!fileList) return;
+            const files = fData.files || [];
+            if (files.length === 0) {
+              fileList.innerHTML = '<div style="color:#64748b">无文件</div>';
+            } else {
+              fileList.innerHTML = files.map(f => {
+                const icon = f.name.endsWith('.md') ? '📄' : (f.name.includes('/') ? '📁' : '📋');
+                return '<div class="desk-item" style="text-align:left;padding:8px 10px;font-size:12px;cursor:pointer" onclick="viewAgentFile(\'' + agentId + '\',\'' + escHtml(f.name).replace(/'/g, "\\'") + '\')">' + icon + ' ' + escHtml(f.name) + '<div style="color:#475569;font-size:10px">' + (f.size > 1024 ? Math.round(f.size/1024) + 'KB' : f.size + 'B') + ' · ' + timeAgo(f.modified) + '</div></div>';
+              }).join('');
+            }
+          } catch(e) {
+            const fileList = document.getElementById('desk-file-list');
+            if (fileList) fileList.innerHTML = '<div class="line err">文件列表加载失败</div>';
+          }
         }
 
         function timeAgo(iso) {
@@ -4714,6 +4732,67 @@ function toggleBrokerPanel() {
         function escHtml(s) {
           return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         }
+
+        // F3: View/Edit agent file
+        window.viewAgentFile = async function(agentId, filePath) {
+          const terminal = document.getElementById('desk-terminal');
+          if (!terminal) return;
+          terminal.innerHTML = '<div class="line cmd">$ cat ' + escHtml(filePath) + '</div><div class="line out">加载中...<span class="cursor-blink">▌</span></div>';
+          try {
+            const res = await fetch('http://localhost:3200/api/agents/' + agentId + '/files?path=' + encodeURIComponent(filePath));
+            const data = await res.json();
+            const content = data.content || '';
+            let html = '<div class="line cmd">$ cat ' + escHtml(filePath) + ' <span style="color:#64748b">(' + (data.size||0) + ' bytes)</span></div>';
+            html += '<div style="margin:8px 0;padding:12px;background:rgba(0,0,0,0.3);border:1px solid rgba(0,255,170,0.15);border-radius:6px;white-space:pre-wrap;font-size:13px;line-height:1.5;max-height:300px;overflow-y:auto;color:#c0cad8">' + escHtml(content) + '</div>';
+            html += '<div style="margin-top:10px;display:flex;gap:8px">';
+            html += '<button class="back-btn" style="font-size:11px;padding:4px 12px" onclick="editAgentFile(\'' + agentId + '\',\'' + escHtml(filePath).replace(/'/g,"\\'") + '\')">✏️ 编辑</button>';
+            html += '<button class="back-btn" style="font-size:11px;padding:4px 12px" onclick="openDeskView(\'' + agentId + '\',\'' + escHtml(data.agent?.name||agentId).replace(/'/g,"\\'") + '\',\'idle\',\'\')">← 返回状态</button>';
+            html += '</div>';
+            terminal.innerHTML = html;
+          } catch(e) {
+            terminal.innerHTML = '<div class="line err">❌ 读取失败: ' + e.message + '</div>';
+          }
+        };
+
+        window.editAgentFile = async function(agentId, filePath) {
+          const terminal = document.getElementById('desk-terminal');
+          if (!terminal) return;
+          try {
+            const res = await fetch('http://localhost:3200/api/agents/' + agentId + '/files?path=' + encodeURIComponent(filePath));
+            const data = await res.json();
+            const content = data.content || '';
+            let html = '<div class="line cmd">$ vi ' + escHtml(filePath) + '</div>';
+            html += '<textarea id="file-editor" style="width:100%;min-height:250px;max-height:400px;background:rgba(0,0,0,0.4);color:#c0cad8;border:1px solid rgba(0,255,170,0.3);border-radius:6px;padding:12px;font-family:monospace;font-size:13px;line-height:1.5;resize:vertical">' + escHtml(content) + '</textarea>';
+            html += '<div style="margin-top:10px;display:flex;gap:8px">';
+            html += '<button class="back-btn" style="font-size:11px;padding:4px 12px;border-color:#22c55e;color:#22c55e" onclick="saveAgentFile(\'' + agentId + '\',\'' + escHtml(filePath).replace(/'/g,"\\'") + '\')">💾 保存</button>';
+            html += '<button class="back-btn" style="font-size:11px;padding:4px 12px" onclick="viewAgentFile(\'' + agentId + '\',\'' + escHtml(filePath).replace(/'/g,"\\'") + '\')">取消</button>';
+            html += '</div>';
+            terminal.innerHTML = html;
+          } catch(e) {
+            terminal.innerHTML = '<div class="line err">❌ 加载失败: ' + e.message + '</div>';
+          }
+        };
+
+        window.saveAgentFile = async function(agentId, filePath) {
+          const editor = document.getElementById('file-editor');
+          if (!editor) return;
+          const content = editor.value;
+          const terminal = document.getElementById('desk-terminal');
+          try {
+            const res = await fetch('http://localhost:3200/api/agents/' + agentId + '/files', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ path: filePath, content: content })
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            if (terminal) {
+              terminal.innerHTML = '<div class="line info">✅ ' + escHtml(filePath) + ' 已保存</div>';
+              setTimeout(() => viewAgentFile(agentId, filePath), 1000);
+            }
+          } catch(e) {
+            if (terminal) terminal.innerHTML += '<div class="line err">❌ 保存失败: ' + e.message + '</div>';
+          }
+        };
 
         // 启动游戏
         initGame();
