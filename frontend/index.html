@@ -4535,7 +4535,7 @@ function toggleBrokerPanel() {
         // 假 Agent 气泡逻辑已移除，统一以真实 /agents 数据为准
 
         // === F2 Desk View ===
-        const LOBSTER_API = '/lobster-admin/api';
+        const LOBSTER_API = '';
         const NAME_TO_LOBSTER_ID = {
           'Sky 🌤️':'sky','K哥 📋':'manager','Pin哥 📌':'cto','Max 🔧':'devops',
           '波哥 🌊':'backend','Jr 🎨':'frontend','Yang 🧪':'qa'
@@ -4658,57 +4658,45 @@ function toggleBrokerPanel() {
           document.body.appendChild(overlay);
           overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
 
-          // Fetch real session data
+          // Fetch real agent data from /agents
           try {
-            const res = await fetch(LOBSTER_API + '/agents/' + lobsterId + '/sessions');
-            const data = await res.json();
+            const res = await fetch('/agents');
+            const allAgents = await res.json();
             const terminal = document.getElementById('desk-terminal');
             if (!terminal) return;
 
-            const agent = data.agent || {};
-            const sessions = data.sessions || [];
+            const agent = allAgents.find(a => a.agentId === agentId) || {};
+            const agentState = agent.state || state;
+            const agentDetail = agent.detail || detail || '暂无';
+            const agentName = agent.name || name;
+            const updatedAt = agent.updated_at ? timeAgo(agent.updated_at) : '未知';
 
             let html = '';
-            html += '<div class="line cmd">$ lobster agent --id ' + lobsterId + ' --status</div>';
-            html += '<div class="line info">📡 ' + (agent.name||name) + ' ' + (agent.emoji||'') + ' - ' + (agent.status||state) + '</div>';
-            html += '<div class="line out">活跃 session: ' + (agent.activeSessions||0) + '</div>';
-            html += '<div class="line cmd">$ lobster sessions --agent ' + lobsterId + ' --list</div>';
+            html += '<div class="line cmd">$ lobster agent --id ' + agentId + ' --status</div>';
+            html += '<div class="line info">📡 ' + escHtml(agentName) + ' - ' + (stateLabel[agentState]||agentState) + ' ' + (stateEmoji[agentState]||'') + '</div>';
+            html += '<div class="line out">当前任务: ' + escHtml(agentDetail) + '</div>';
+            html += '<div class="line out">最后更新: ' + updatedAt + '</div>';
+            html += '<div class="line out">区域: ' + (agent.area||'unknown') + '</div>';
+            html += '<div class="line cmd">$ lobster team --online</div>';
 
-            if (sessions.length === 0) {
-              html += '<div class="line warn">⚠ 暂无活跃 session</div>';
-            } else {
-              const MAX_SHOW = 8;
-              const showSessions = sessions.slice(0, MAX_SHOW);
-              showSessions.forEach((s, i) => {
-                const label = s.label || s.sessionKey || 'unknown';
-                const short = label.length > 50 ? label.slice(0,47)+'...' : label;
-                const ago = s.lastActivity ? timeAgo(s.lastActivity) : '未知';
-                const kind = s.kind || 'unknown';
-                html += '<div class="session-card" onclick="alert(decodeURIComponent(\'' + encodeURIComponent(s.sessionKey||'') + '\'))">';
-                html += '<div class="session-label">' + (i+1) + '. ' + escHtml(short) + '</div>';
-                html += '<div class="session-meta">📌 ' + kind + ' · 🕐 ' + ago + ' · 📡 ' + (s.channel||'-') + '</div>';
-                html += '</div>';
-              });
-              if (sessions.length > MAX_SHOW) {
-                html += '<div class="line info" style="margin-top:6px;cursor:pointer" onclick="this.parentElement.querySelectorAll(\'.hidden-session\').forEach(e=>e.style.display=\'block\');this.style.display=\'none\'">▶ 还有 ' + (sessions.length - MAX_SHOW) + ' 个 session，点击展开...</div>';
-                sessions.slice(MAX_SHOW).forEach((s, i) => {
-                  const label = s.label || s.sessionKey || 'unknown';
-                  const short = label.length > 50 ? label.slice(0,47)+'...' : label;
-                  const ago = s.lastActivity ? timeAgo(s.lastActivity) : '未知';
-                  const kind = s.kind || 'unknown';
-                  html += '<div class="session-card hidden-session" style="display:none" onclick="alert(decodeURIComponent(\'' + encodeURIComponent(s.sessionKey||'') + '\'))">';
-                  html += '<div class="session-label">' + (MAX_SHOW+i+1) + '. ' + escHtml(short) + '</div>';
-                  html += '<div class="session-meta">📌 ' + kind + ' · 🕐 ' + ago + ' · 📡 ' + (s.channel||'-') + '</div>';
-                  html += '</div>';
-                });
-              }
-            }
-            html += '<div class="line out" style="margin-top:8px;color:#334155">- end of sessions -<span class="cursor-blink">▌</span></div>';
+            // Show all team members status
+            const teamAgents = allAgents.filter(a => a.agentId !== 'star');
+            teamAgents.forEach(a => {
+              const isMe = a.agentId === agentId;
+              const prefix = isMe ? '► ' : '  ';
+              const color = isMe ? 'info' : 'out';
+              html += '<div class="session-card' + (isMe ? ' style="border-left-color:#ffaa00"' : '') + '">';
+              html += '<div class="session-label">' + (stateEmoji[a.state]||'') + ' ' + escHtml(a.name||a.agentId) + '</div>';
+              html += '<div class="session-meta">📌 ' + (stateLabel[a.state]||a.state) + ' · 📝 ' + escHtml((a.detail||'').slice(0,40)) + '</div>';
+              html += '</div>';
+            });
+
+            html += '<div class="line out" style="margin-top:8px;color:#334155">- end -<span class="cursor-blink">▌</span></div>';
             terminal.innerHTML = html;
           } catch(e) {
             const terminal = document.getElementById('desk-terminal');
             if (terminal) {
-              terminal.innerHTML += '<div class="line err">❌ 无法连接 Lobster API: ' + e.message + '</div>';
+              terminal.innerHTML += '<div class="line err">❌ API 连接失败: ' + e.message + '</div>';
             }
           }
         }
