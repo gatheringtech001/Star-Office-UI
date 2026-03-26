@@ -4836,38 +4836,37 @@ function toggleBrokerPanel() {
         };
 
         let currentNoteId = null;
-        const WB_API = 'agent-files/star'; // Use star agent as shared whiteboard storage
 
         async function loadWhiteboardNotes() {
           const listEl = document.getElementById('wb-note-list');
           if (!listEl) return;
           try {
-            const res = await fetch(WB_API);
+            const res = await fetch('whiteboard/notes');
             const data = await res.json();
-            const files = (data.files || []).filter(f => f.name.startsWith('whiteboard/') || f.name === 'WHITEBOARD.md');
-            if (files.length === 0) {
+            const notes = data.notes || [];
+            if (notes.length === 0) {
               listEl.innerHTML = '<div style="color:#475569;font-size:11px">暂无笔记</div>';
               return;
             }
-            listEl.innerHTML = files.map(f => {
-              const short = f.name.replace('whiteboard/', '').replace('.md', '');
-              return '<div style="padding:6px 8px;cursor:pointer;border-radius:4px;margin-bottom:4px;border-left:2px solid transparent;transition:all 0.2s" class="wb-note-item" onclick="loadNote(\'' + escHtml(f.name).replace(/'/g, "\\'") + '\')" onmouseover="this.style.background=\'rgba(0,255,170,0.05)\';this.style.borderLeftColor=\'#00ffaa\'" onmouseout="this.style.background=\'transparent\';this.style.borderLeftColor=\'transparent\'">' + escHtml(short) + '<div style="font-size:10px;color:#475569">' + timeAgo(f.modified) + '</div></div>';
+            listEl.innerHTML = notes.map(n => {
+              const short = n.id;
+              return '<div style="padding:6px 8px;cursor:pointer;border-radius:4px;margin-bottom:4px;border-left:2px solid transparent;transition:all 0.2s" onclick="loadNote(\'' + escHtml(n.id).replace(/'/g, "\\'") + '\')" onmouseover="this.style.background=\'rgba(0,255,170,0.05)\';this.style.borderLeftColor=\'#00ffaa\'" onmouseout="this.style.background=\'transparent\';this.style.borderLeftColor=\'transparent\'">' + escHtml(short) + '<div style="font-size:10px;color:#475569">' + (n.size||0) + 'B · ' + timeAgo(n.modified) + '</div></div>';
             }).join('');
           } catch(e) {
             listEl.innerHTML = '<div style="color:#ef4444">加载失败</div>';
           }
         }
 
-        window.loadNote = async function(path) {
-          currentNoteId = path;
+        window.loadNote = async function(noteId) {
+          currentNoteId = noteId;
           const editor = document.getElementById('wb-editor');
           const title = document.getElementById('wb-note-title');
           const status = document.getElementById('wb-status');
           if (!editor) return;
-          title.textContent = '📝 ' + path;
+          title.textContent = '📝 ' + noteId;
           editor.value = '加载中...';
           try {
-            const res = await fetch(WB_API + '?path=' + encodeURIComponent(path));
+            const res = await fetch('whiteboard/notes/' + encodeURIComponent(noteId));
             const data = await res.json();
             editor.value = data.content || '';
             status.textContent = (data.size || 0) + ' bytes · ' + timeAgo(data.modified || '');
@@ -4882,10 +4881,10 @@ function toggleBrokerPanel() {
           const status = document.getElementById('wb-status');
           if (!editor) return;
           try {
-            const res = await fetch(WB_API, {
+            const res = await fetch('whiteboard/notes/' + encodeURIComponent(currentNoteId), {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ path: currentNoteId, content: editor.value })
+              body: JSON.stringify({ content: editor.value })
             });
             if (!res.ok) throw new Error('HTTP ' + res.status);
             status.textContent = '✅ 已保存 · ' + new Date().toLocaleTimeString('zh-CN');
@@ -4898,18 +4897,18 @@ function toggleBrokerPanel() {
         };
 
         window.createNote = async function() {
-          const name = prompt('笔记名称（不含 .md 后缀）：');
+          const name = prompt('笔记名称：');
           if (!name || !name.trim()) return;
-          const path = 'whiteboard/' + name.trim() + '.md';
+          const noteId = name.trim();
           try {
-            await fetch(WB_API, {
+            await fetch('whiteboard/notes/' + encodeURIComponent(noteId), {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ path: path, content: '# ' + name.trim() + '\\n\\n' })
+              body: JSON.stringify({ content: '# ' + noteId + '\n\n' })
             });
-            currentNoteId = path;
+            currentNoteId = noteId;
             loadWhiteboardNotes();
-            loadNote(path);
+            loadNote(noteId);
           } catch(e) {
             alert('创建失败: ' + e.message);
           }
