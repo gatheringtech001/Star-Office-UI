@@ -1301,49 +1301,28 @@ def proxy_agent_files_write(agent_id):
         return jsonify({"error": str(e)}), 502
 
 
-# ---- F4: Whiteboard API ----
-WHITEBOARD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "whiteboard")
-os.makedirs(WHITEBOARD_DIR, exist_ok=True)
+# ---- F4: Whiteboard Proxy (→ localhost:3200) ----
 
-@app.route("/whiteboard/notes", methods=["GET"])
-def wb_list_notes():
-    notes = []
-    for f in sorted(os.listdir(WHITEBOARD_DIR)):
-        if f.endswith(".md"):
-            path = os.path.join(WHITEBOARD_DIR, f)
-            stat = os.stat(path)
-            notes.append({"id": f.replace(".md",""), "name": f, "size": stat.st_size,
-                           "modified": datetime.fromtimestamp(stat.st_mtime).isoformat()+"Z"})
-    return jsonify({"notes": notes})
+@app.route("/whiteboard", methods=["GET"])
+def wb_get():
+    try:
+        req = urllib.request.Request("http://localhost:3200/api/whiteboard")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            return make_response(resp.read(), 200, {"Content-Type": "application/json"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 502
 
-@app.route("/whiteboard/notes/<note_id>", methods=["GET"])
-def wb_get_note(note_id):
-    path = os.path.join(WHITEBOARD_DIR, note_id + ".md")
-    if not os.path.exists(path):
-        return jsonify({"error": "not found"}), 404
-    with open(path, "r", encoding="utf-8") as f:
-        content = f.read()
-    stat = os.stat(path)
-    return jsonify({"id": note_id, "content": content, "size": stat.st_size,
-                     "modified": datetime.fromtimestamp(stat.st_mtime).isoformat()+"Z"})
-
-@app.route("/whiteboard/notes/<note_id>", methods=["PUT"])
-def wb_save_note(note_id):
-    data = request.get_json()
-    if not data or "content" not in data:
-        return jsonify({"error": "content required"}), 400
-    safe_id = re.sub(r'[^\w\u4e00-\u9fff\-]', '_', note_id)
-    path = os.path.join(WHITEBOARD_DIR, safe_id + ".md")
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(data["content"])
-    return jsonify({"ok": True, "id": safe_id})
-
-@app.route("/whiteboard/notes/<note_id>", methods=["DELETE"])
-def wb_delete_note(note_id):
-    path = os.path.join(WHITEBOARD_DIR, note_id + ".md")
-    if os.path.exists(path):
-        os.remove(path)
-    return jsonify({"ok": True})
+@app.route("/whiteboard", methods=["PUT"])
+def wb_put():
+    try:
+        body = request.get_data()
+        req = urllib.request.Request("http://localhost:3200/api/whiteboard",
+                                     data=body, method="PUT",
+                                     headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            return make_response(resp.read(), 200, {"Content-Type": "application/json"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 502
 
 
 @app.route("/yesterday-memo", methods=["GET"])
