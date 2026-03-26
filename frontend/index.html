@@ -4665,7 +4665,7 @@ function toggleBrokerPanel() {
 
           // Fetch real agent data from /agents
           try {
-            const res = await fetch('/agents');
+            const res = await fetch('agents');
             const allAgents = await res.json();
             const terminal = document.getElementById('desk-terminal');
             if (!terminal) return;
