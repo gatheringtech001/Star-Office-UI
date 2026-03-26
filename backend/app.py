@@ -1267,6 +1267,40 @@ def health():
     })
 
 
+# Proxy to lobster backend (port 3200) for agent files API
+import urllib.request
+import urllib.error
+
+@app.route("/agent-files/<agent_id>", methods=["GET"])
+def proxy_agent_files_list(agent_id):
+    """Proxy GET /api/agents/{id}/files from lobster backend"""
+    path = request.args.get("path", "")
+    url = f"http://localhost:3200/api/agents/{agent_id}/files"
+    if path:
+        url += f"?path={urllib.parse.quote(path)}"
+    try:
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = resp.read()
+            return make_response(data, 200, {"Content-Type": "application/json"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 502
+
+@app.route("/agent-files/<agent_id>", methods=["PUT"])
+def proxy_agent_files_write(agent_id):
+    """Proxy PUT /api/agents/{id}/files to lobster backend"""
+    url = f"http://localhost:3200/api/agents/{agent_id}/files"
+    try:
+        body = request.get_data()
+        req = urllib.request.Request(url, data=body, method="PUT",
+                                     headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = resp.read()
+            return make_response(data, 200, {"Content-Type": "application/json"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 502
+
+
 @app.route("/yesterday-memo", methods=["GET"])
 def get_yesterday_memo():
     """获取昨日小日记"""

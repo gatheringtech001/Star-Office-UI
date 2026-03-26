@@ -4700,7 +4700,7 @@ function toggleBrokerPanel() {
 
           // F3: Fetch agent files
           try {
-            const fRes = await fetch('http://localhost:3200/api/agents/' + agentId + '/files');
+                        const fRes = await fetch('agent-files/' + agentId);
             const fData = await fRes.json();
             const fileList = document.getElementById('desk-file-list');
             if (!fileList) return;
@@ -4739,7 +4739,7 @@ function toggleBrokerPanel() {
           if (!terminal) return;
           terminal.innerHTML = '<div class="line cmd">$ cat ' + escHtml(filePath) + '</div><div class="line out">加载中...<span class="cursor-blink">▌</span></div>';
           try {
-            const res = await fetch('http://localhost:3200/api/agents/' + agentId + '/files?path=' + encodeURIComponent(filePath));
+            const res = await fetch('agent-files/' + agentId + '?path=' + encodeURIComponent(filePath));
             const data = await res.json();
             const content = data.content || '';
             let html = '<div class="line cmd">$ cat ' + escHtml(filePath) + ' <span style="color:#64748b">(' + (data.size||0) + ' bytes)</span></div>';
@@ -4758,7 +4758,7 @@ function toggleBrokerPanel() {
           const terminal = document.getElementById('desk-terminal');
           if (!terminal) return;
           try {
-            const res = await fetch('http://localhost:3200/api/agents/' + agentId + '/files?path=' + encodeURIComponent(filePath));
+            const res = await fetch('agent-files/' + agentId + '?path=' + encodeURIComponent(filePath));
             const data = await res.json();
             const content = data.content || '';
             let html = '<div class="line cmd">$ vi ' + escHtml(filePath) + '</div>';
@@ -4779,7 +4779,7 @@ function toggleBrokerPanel() {
           const content = editor.value;
           const terminal = document.getElementById('desk-terminal');
           try {
-            const res = await fetch('http://localhost:3200/api/agents/' + agentId + '/files', {
+            const res = await fetch('agent-files/' + agentId, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ path: filePath, content: content })
