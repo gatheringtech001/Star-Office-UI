@@ -248,6 +248,14 @@ ensure_electron_standalone_snapshot()
 _INDEX_HTML_CACHE = None
 
 
+@app.route("/demo", methods=["GET"])
+def demo_page():
+    """Serve the demo/showcase landing page"""
+    demo_file = os.path.join(FRONTEND_DIR, "home.html")
+    if os.path.exists(demo_file):
+        return send_from_directory(FRONTEND_DIR, "home.html")
+    return "Demo page not found", 404
+
 @app.route("/", methods=["GET"])
 def index():
     """Serve the pixel office UI with built-in version cache busting"""
